@@ -231,7 +231,7 @@ ArithmeticJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw ArithmeticSHL
     dw DummyInstruction
 
 ; ------------------------------------------------------------------------------
@@ -367,6 +367,31 @@ ArithmeticSHR::
 .setLSB
     ld a, 1
 .unsetLSB
+    ld [hl], a
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 8xyE - SHL Vx {, Vy}
+; Set Vx = Vx SHL 1.
+; ------------------------------------------------------------------------------
+ArithmeticSHL::
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, d
+    sla a
+    ld [hl], a
+    ld a, $0F
+    ld l, a
+    jr c, .setMSB
+    xor a
+    jr .unsetMSB
+.setMSB
+    ld a, 1
+.unsetMSB
     ld [hl], a
     pop hl
     jp EmuLoop
