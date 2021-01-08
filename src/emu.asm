@@ -4,9 +4,6 @@ EmuLoop::
     halt 
     nop
 
-    ; Debug Breakpoint
-    ld b, b
-
     ; Read instruction into BC
     ld a, [hli]
     ld b, a
@@ -26,24 +23,40 @@ EmuLoop::
     ld h, a
 
     ; Load instruction routine pointer into HL
-    push de
     ld a, [hli]
     ld e, a
     ld a, [hl]
     ld h, a
     ld l, e
-    pop de
 
-    ; Load high instruction byte into A and jump to instruction routine
-    ld a, b
+    ; Jump to instruction routine
     jp hl
 
 DummyInstruction::
     pop hl
     jp EmuLoop
 
+ZeroByteInstruction::
+    ld a, c
+    cp $E0
+    jr z, ClearDisplayInstruction
+
+ReturnInstruction::
+    ; Pop off Emulated stack onto HL
+    call EmuPop
+    pop hl
+    ld h, d
+    ld l, e
+    jp EmuLoop
+
+ClearDisplayInstruction::
+    ; TODO: Implement Properly
+    pop hl
+    jp EmuLoop
+
 JumpInstruction::
     pop hl
+    ld a, b
     and $0F
     add HIGH(wBaseMemory)
     ld h, a
@@ -51,7 +64,7 @@ JumpInstruction::
     jp EmuLoop
 
 InstrJumpTable::
-    dw DummyInstruction
+    dw ZeroByteInstruction
     dw JumpInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -67,3 +80,26 @@ InstrJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
+
+; ------------------------------------------------------------------------------
+; Pops a 16-bit value off the emulated stack onto DE.
+; ------------------------------------------------------------------------------
+EmuPop::
+    ; Get pointer to top of stack and decrement SP
+    ld a, [wSP]
+    dec a
+    ld [wSP], a
+    inc a
+    add a
+    add LOW(wStack)
+    ld l, a
+    adc HIGH(wStack)
+    sub l
+    ld h, a
+
+    ; Load data from stack into DE and return
+    ld a, [hli]
+    ld e, a
+    ld a, [hl]
+    ld d, a
+    ret
