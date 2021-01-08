@@ -87,6 +87,20 @@ JumpInstruction::
     ld h, a
     ld l, c
     jp EmuLoop
+    
+; ------------------------------------------------------------------------------
+; 6xkk - LD Vx, byte
+; Set Vx = kk.
+; ------------------------------------------------------------------------------
+LoadInstruction::
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld [hl], c
+    pop hl
+    jp EmuLoop
 
 ; ------------------------------------------------------------------------------
 ; Table containing jump vectors related to the upper 4 bits of the instruction.
@@ -98,7 +112,7 @@ InstrJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw LoadInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
