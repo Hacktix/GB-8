@@ -1,0 +1,2 @@
+SECTION "WRAM", WRAM0
+wBaseMemory: ds $1000
