@@ -114,7 +114,6 @@ ILoadInstruction::
     and $0F
     ld [hli], a
     ld [hl], c
-    ld b,b
     pop hl
     jp EmuLoop
 
