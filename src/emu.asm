@@ -1,4 +1,8 @@
 SECTION "Emulator Code", ROM0
+; ------------------------------------------------------------------------------
+; Main loop of the emulator, runs a certain amount of emulated cycles each
+; frame.
+; ------------------------------------------------------------------------------
 EmuLoop::
     ; Wait for VBlank
     halt 
@@ -32,15 +36,28 @@ EmuLoop::
     ; Jump to instruction routine
     jp hl
 
+; ------------------------------------------------------------------------------
+; Placeholder for unimplemented instructions - does absolutely nothing.
+; ------------------------------------------------------------------------------
 DummyInstruction::
     pop hl
     jp EmuLoop
 
+; ------------------------------------------------------------------------------
+; Checks the low byte of the instruction to check what to actually do.
+; ------------------------------------------------------------------------------
 ZeroByteInstruction::
     ld a, c
     cp $E0
     jr z, ClearDisplayInstruction
 
+; ------------------------------------------------------------------------------
+; 00EE - RET
+; Return from a subroutine.
+;
+; The interpreter sets the program counter to the address at the top of the
+; stack, then subtracts 1 from the stack pointer.
+; ------------------------------------------------------------------------------
 ReturnInstruction::
     ; Pop off Emulated stack onto HL
     call EmuPop
@@ -49,11 +66,19 @@ ReturnInstruction::
     ld l, e
     jp EmuLoop
 
+; ------------------------------------------------------------------------------
+; 00E0 - CLS
+; Clear the display.
+; ------------------------------------------------------------------------------
 ClearDisplayInstruction::
     ; TODO: Implement Properly
     pop hl
     jp EmuLoop
 
+; ------------------------------------------------------------------------------
+; 1nnn - JP addr
+; Jump to location nnn.
+; ------------------------------------------------------------------------------
 JumpInstruction::
     pop hl
     ld a, b
@@ -63,6 +88,9 @@ JumpInstruction::
     ld l, c
     jp EmuLoop
 
+; ------------------------------------------------------------------------------
+; Table containing jump vectors related to the upper 4 bits of the instruction.
+; ------------------------------------------------------------------------------
 InstrJumpTable::
     dw ZeroByteInstruction
     dw JumpInstruction
