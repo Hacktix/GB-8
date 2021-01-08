@@ -220,7 +220,7 @@ ArithmeticJumpTable::
     dw RegisterLoadInstruction
     dw ArithmeticOR
     dw ArithmeticAND
-    dw DummyInstruction
+    dw ArithmeticXOR
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -269,8 +269,23 @@ ArithmeticOR::
 ; Set Vx = Vx AND Vy.
 ; ------------------------------------------------------------------------------
 ArithmeticAND::
-    ld b, b
     and e
+    ld d, a
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld [hl], d
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 8xy3 - XOR Vx, Vy
+; Set Vx = Vx XOR Vy.
+; ------------------------------------------------------------------------------
+ArithmeticXOR::
+    xor e
     ld d, a
     ld a, b
     and $0F
