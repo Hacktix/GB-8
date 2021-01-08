@@ -337,12 +337,12 @@ ArithmeticSUB::
     ld [hl], a
     ld a, $0F
     ld l, a
-    jr c, .setCarry
+    jr nc, .noBorrow
     ld a, 0
-    jr .noCarry
-.setCarry
+    jr .setBorrow
+.noBorrow
     ld a, 1
-.noCarry
+.setBorrow
     ld [hl], a
     pop hl
     jp EmuLoop
