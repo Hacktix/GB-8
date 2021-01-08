@@ -166,6 +166,26 @@ AddInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; 9xy0 - SNE Vx, Vy
+; Skip next instruction if Vx != Vy.
+; ------------------------------------------------------------------------------
+SkipNotEqualRegisterInstruction::
+    ld b, b
+    ld a, b
+    call EmuRegRead
+    ld d, a
+    ld a, c
+    swap a
+    call EmuRegRead
+    pop hl
+    cp d
+    jr z, .isEqual
+    inc hl
+    inc hl
+.isEqual
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Annn - LD I, addr
 ; Set I = nnn.
 ; ------------------------------------------------------------------------------
@@ -202,7 +222,7 @@ InstrJumpTable::
     dw LoadInstruction
     dw AddInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw SkipNotEqualRegisterInstruction
     dw ILoadInstruction
     dw DummyInstruction
     dw DummyInstruction
