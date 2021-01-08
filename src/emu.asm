@@ -182,6 +182,59 @@ AddInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; Loads DE with Vx and Vy and calls the proper subroutine for any 8xyz instruction.
+; ------------------------------------------------------------------------------
+ArithmeticInstruction::
+    ; Get pointer to Jump Table
+    ld hl, ArithmeticJumpTable
+    ld a, c
+    and $0F
+    add a
+    add l
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    ld a, [hli]
+    ld e, a
+    ld a, [hl]
+    ld d, a
+    ld h, d
+    ld l, e
+
+    ; Load DE with Vx and Vy
+    push hl
+    ld a, c
+    swap a
+    call EmuRegRead
+    ld e, a
+    ld a, b
+    call EmuRegRead
+    ld d, a
+    pop hl
+
+    ; Jump to jump table vector
+    jp hl
+
+ArithmeticJumpTable::
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+
+; ------------------------------------------------------------------------------
 ; 9xy0 - SNE Vx, Vy
 ; Skip next instruction if Vx != Vy.
 ; ------------------------------------------------------------------------------
@@ -236,7 +289,7 @@ InstrJumpTable::
     dw SkipEqualRegisterInstruction
     dw LoadInstruction
     dw AddInstruction
-    dw DummyInstruction
+    dw ArithmeticInstruction
     dw SkipNotEqualRegisterInstruction
     dw ILoadInstruction
     dw DummyInstruction
