@@ -22,19 +22,24 @@ Main::
     xor a
     ld [rLCDC], a
 
-    ; Load ROM into memory
+    ; Load Fontset into memory
     ld hl, wBaseMemory
+    ld de, Fontset
+    ld bc, EndFontset - Fontset
+    call Memcpy
+
+    ; Fill memory with zero up to $200
+    ld bc, ($200 - (EndFontset - Fontset))
+    call Zerofill
+
+    ; Load ROM into memory
     ld de, TestROM
     ld bc, EndTestROM - TestROM
     call Memcpy
 
     ; Fill rest of memory with zero
-.memZeroFillLoop
-    xor a
-    ld [hli], a
-    ld a, h
-    cp HIGH(wBaseMemory + $1000)
-    jr nz, .memZeroFillLoop
+    ld bc, ($1000 - $200 - (TestROM - EndTestROM))
+    call Zerofill
 
     jr @
 
