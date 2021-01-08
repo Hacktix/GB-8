@@ -37,10 +37,12 @@ EmuLoop::
     jp hl
 
 ; ------------------------------------------------------------------------------
-; Placeholder for unimplemented instructions - does absolutely nothing.
+; Placeholder for unimplemented instructions - does absolutely nothing other
+; than triggering an emulator breakpoint using LD b, b.
 ; ------------------------------------------------------------------------------
 DummyInstruction::
     pop hl
+    ld b, b
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
