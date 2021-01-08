@@ -217,6 +217,7 @@ ArithmeticInstruction::
     jp hl
 
 ArithmeticJumpTable::
+    dw RegisterLoadInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -232,7 +233,20 @@ ArithmeticJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+
+; ------------------------------------------------------------------------------
+; 8xy0 - LD Vx, Vy
+; Set Vx = Vy.
+; ------------------------------------------------------------------------------
+RegisterLoadInstruction::
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld [hl], e
+    pop hl
+    jp EmuLoop
 
 ; ------------------------------------------------------------------------------
 ; 9xy0 - SNE Vx, Vy
