@@ -105,6 +105,20 @@ LoadInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; Annn - LD I, addr
+; Set I = nnn.
+; ------------------------------------------------------------------------------
+ILoadInstruction::
+    ld hl, wRegI
+    ld a, b
+    and $0F
+    ld [hli], a
+    ld [hl], c
+    ld b,b
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Table containing jump vectors related to the upper 4 bits of the instruction.
 ; ------------------------------------------------------------------------------
 InstrJumpTable::
@@ -118,7 +132,7 @@ InstrJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw ILoadInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
