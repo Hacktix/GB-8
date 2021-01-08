@@ -33,7 +33,7 @@ Main::
     xor a
     ld [hli], a
     ld a, h
-    cp HIGH(_RAM + $1000)
+    cp HIGH(wBaseMemory + $1000)
     jr nz, .memZeroFillLoop
 
     jr @
