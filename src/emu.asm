@@ -218,7 +218,7 @@ ArithmeticInstruction::
 
 ArithmeticJumpTable::
     dw RegisterLoadInstruction
-    dw DummyInstruction
+    dw ArithmeticOR
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -245,6 +245,22 @@ RegisterLoadInstruction::
     ld a, HIGH(wRegV)
     ld h, a
     ld [hl], e
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 8xy1 - OR Vx, Vy
+; Set Vx = Vx OR Vy.
+; ------------------------------------------------------------------------------
+ArithmeticOR::
+    or e
+    ld d, a
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld [hl], d
     pop hl
     jp EmuLoop
 
