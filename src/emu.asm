@@ -88,6 +88,26 @@ SkipEqualInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; 4xkk - SE Vx, byte
+; Skip next instruction if Vx != kk.
+; ------------------------------------------------------------------------------
+SkipNotEqualInstruction::
+    ld b, b
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, [hl]
+    pop hl
+    cp c
+    jr z, .isEqual
+    inc hl
+    inc hl
+.isEqual
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; 00E0 - CLS
 ; Clear the display.
 ; ------------------------------------------------------------------------------
@@ -144,7 +164,7 @@ InstrJumpTable::
     dw JumpInstruction
     dw DummyInstruction
     dw SkipEqualInstruction
-    dw DummyInstruction
+    dw SkipNotEqualInstruction
     dw DummyInstruction
     dw LoadInstruction
     dw DummyInstruction
