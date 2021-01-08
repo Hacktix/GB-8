@@ -91,6 +91,22 @@ JumpInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; 2nnn - CALL addr
+; Call subroutine at nnn.
+; ------------------------------------------------------------------------------
+CallInstruction::
+    pop hl
+    ld d, h
+    ld e, l
+    call EmuPush
+    ld a, b
+    and $0F
+    add HIGH(wBaseMemory)
+    ld h, a
+    ld l, c
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; 3xkk - SE Vx, byte
 ; Skip next instruction if Vx = kk.
 ; ------------------------------------------------------------------------------
@@ -170,7 +186,6 @@ AddInstruction::
 ; Skip next instruction if Vx != Vy.
 ; ------------------------------------------------------------------------------
 SkipNotEqualRegisterInstruction::
-    ld b, b
     ld a, b
     call EmuRegRead
     ld d, a
@@ -215,7 +230,7 @@ DrawInstruction::
 InstrJumpTable::
     dw ZeroByteInstruction
     dw JumpInstruction
-    dw DummyInstruction
+    dw CallInstruction
     dw SkipEqualInstruction
     dw SkipNotEqualInstruction
     dw SkipEqualRegisterInstruction
@@ -245,11 +260,10 @@ EmuRegRead::
 ; Pops a 16-bit value off the emulated stack onto DE.
 ; ------------------------------------------------------------------------------
 EmuPop::
-    ; Get pointer to top of stack and decrement SP
+    ; Decrement SP and get pointer to top of stack
     ld a, [wSP]
     dec a
     ld [wSP], a
-    inc a
     add a
     add LOW(wStack)
     ld l, a
@@ -262,4 +276,29 @@ EmuPop::
     ld e, a
     ld a, [hl]
     ld d, a
+    ret
+
+; ------------------------------------------------------------------------------
+; Pushes a 16-bit value from DE onto the emulated stack.
+; ------------------------------------------------------------------------------
+EmuPush::
+    ; Get pointer to top of stack
+    ld a, [wSP]
+    add a
+    add LOW(wStack)
+    ld l, a
+    adc HIGH(wStack)
+    sub l
+    ld h, a
+
+    ; Load data from DE into stack and return
+    ld a, e
+    ld [hli], a
+    ld a, d
+    ld [hli], a
+
+    ; Increment SP and return
+    ld a, [wSP]
+    inc a
+    ld [wSP], a
     ret
