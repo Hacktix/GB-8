@@ -179,6 +179,17 @@ ILoadInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; Dxyn - DRW Vx, Vy, nibble
+; Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+; ------------------------------------------------------------------------------
+DrawInstruction::
+    ; TODO: Actually implement this.
+    ; For now just here to not annoy me with breakpoints from the
+    ; DummyInstruction references.
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Table containing jump vectors related to the upper 4 bits of the instruction.
 ; ------------------------------------------------------------------------------
 InstrJumpTable::
@@ -195,7 +206,7 @@ InstrJumpTable::
     dw ILoadInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw DrawInstruction
     dw DummyInstruction
     dw DummyInstruction
 
