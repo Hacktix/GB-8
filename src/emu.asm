@@ -74,11 +74,7 @@ ReturnInstruction::
 ; ------------------------------------------------------------------------------
 SkipEqualInstruction::
     ld a, b
-    and $0F
-    ld l, a
-    ld a, HIGH(wRegV)
-    ld h, a
-    ld a, [hl]
+    call EmuRegRead
     pop hl
     cp c
     jr nz, .notEqual
@@ -92,13 +88,8 @@ SkipEqualInstruction::
 ; Skip next instruction if Vx != kk.
 ; ------------------------------------------------------------------------------
 SkipNotEqualInstruction::
-    ld b, b
     ld a, b
-    and $0F
-    ld l, a
-    ld a, HIGH(wRegV)
-    ld h, a
-    ld a, [hl]
+    call EmuRegRead
     pop hl
     cp c
     jr z, .isEqual
@@ -176,6 +167,17 @@ InstrJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
+
+; ------------------------------------------------------------------------------
+; Stores the value of emulated register V[A & $0F] in register A.
+; ------------------------------------------------------------------------------
+EmuRegRead::
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, [hl]
+    ret
 
 ; ------------------------------------------------------------------------------
 ; Pops a 16-bit value off the emulated stack onto DE.
