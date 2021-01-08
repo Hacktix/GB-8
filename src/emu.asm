@@ -99,6 +99,26 @@ SkipNotEqualInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; 5xy0 - SE Vx, Vy
+; Skip next instruction if Vx = Vy.
+; ------------------------------------------------------------------------------
+SkipEqualRegisterInstruction::
+    ld b, b
+    ld a, b
+    call EmuRegRead
+    ld d, a
+    ld a, c
+    swap a
+    call EmuRegRead
+    pop hl
+    cp d
+    jr nz, .notEqual
+    inc hl
+    inc hl
+.notEqual
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; 00E0 - CLS
 ; Clear the display.
 ; ------------------------------------------------------------------------------
@@ -156,7 +176,7 @@ InstrJumpTable::
     dw DummyInstruction
     dw SkipEqualInstruction
     dw SkipNotEqualInstruction
-    dw DummyInstruction
+    dw SkipEqualRegisterInstruction
     dw LoadInstruction
     dw DummyInstruction
     dw DummyInstruction
