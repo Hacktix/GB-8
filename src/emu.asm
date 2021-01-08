@@ -221,7 +221,7 @@ ArithmeticJumpTable::
     dw ArithmeticOR
     dw ArithmeticAND
     dw ArithmeticXOR
-    dw DummyInstruction
+    dw ArithmeticADD
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -293,6 +293,32 @@ ArithmeticXOR::
     ld a, HIGH(wRegV)
     ld h, a
     ld [hl], d
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 8xy4 - ADD Vx, Vy
+; Set Vx = Vx ADD Vy.
+; ------------------------------------------------------------------------------
+ArithmeticADD::
+    ld b, b
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, d
+    add e
+    ld [hl], a
+    ld a, $0F
+    ld l, a
+    jr c, .setCarry
+    ld a, 0
+    jr .noCarry
+.setCarry
+    ld a, 1
+.noCarry
+    ld [hl], a
     pop hl
     jp EmuLoop
 
