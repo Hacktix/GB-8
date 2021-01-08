@@ -224,7 +224,7 @@ ArithmeticJumpTable::
     dw ArithmeticADD
     dw ArithmeticSUB
     dw ArithmeticSHR
-    dw DummyInstruction
+    dw ArithmeticSUBN
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -367,6 +367,31 @@ ArithmeticSHR::
 .setLSB
     ld a, 1
 .unsetLSB
+    ld [hl], a
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 8xy7 - SUBN Vx, Vy
+; Set Vx = Vy - Vx, set VF = NOT borrow.
+; ------------------------------------------------------------------------------
+ArithmeticSUBN::
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, e
+    sub d
+    ld [hl], a
+    ld a, $0F
+    ld l, a
+    jr nc, .noBorrow
+    ld a, 0
+    jr .setBorrow
+.noBorrow
+    ld a, 1
+.setBorrow
     ld [hl], a
     pop hl
     jp EmuLoop
