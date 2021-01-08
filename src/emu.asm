@@ -125,7 +125,6 @@ SkipNotEqualInstruction::
 ; Skip next instruction if Vx = Vy.
 ; ------------------------------------------------------------------------------
 SkipEqualRegisterInstruction::
-    ld b, b
     ld a, b
     call EmuRegRead
     ld d, a
