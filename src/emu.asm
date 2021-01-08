@@ -223,7 +223,7 @@ ArithmeticJumpTable::
     dw ArithmeticXOR
     dw ArithmeticADD
     dw ArithmeticSUB
-    dw DummyInstruction
+    dw ArithmeticSHR
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -326,7 +326,6 @@ ArithmeticADD::
 ; Set Vx = Vx - Vy, set VF = NOT borrow.
 ; ------------------------------------------------------------------------------
 ArithmeticSUB::
-    ld b, b
     ld a, b
     and $0F
     ld l, a
@@ -343,6 +342,31 @@ ArithmeticSUB::
 .noBorrow
     ld a, 1
 .setBorrow
+    ld [hl], a
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 8xy6 - SHR Vx {, Vy}
+; Set Vx = Vx SHR 1.
+; ------------------------------------------------------------------------------
+ArithmeticSHR::
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, d
+    srl a
+    ld [hl], a
+    ld a, $0F
+    ld l, a
+    jr c, .setLSB
+    xor a
+    jr .unsetLSB
+.setLSB
+    ld a, 1
+.unsetLSB
     ld [hl], a
     pop hl
     jp EmuLoop
