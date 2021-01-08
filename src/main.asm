@@ -41,5 +41,10 @@ Main::
     ld bc, ($1000 - $200 - (TestROM - EndTestROM))
     call Zerofill
 
+    ; Clear system variables
+    ld hl, _start_sysvars
+    ld bc, _end_sysvars - _start_sysvars
+    call Zerofill
+
     jr @
 
