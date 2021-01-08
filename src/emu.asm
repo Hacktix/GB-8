@@ -4,6 +4,9 @@ EmuLoop::
     halt 
     nop
 
+    ; Debug Breakpoint
+    ld b, b
+
     ; Read instruction into BC
     ld a, [hli]
     ld b, a
@@ -39,9 +42,17 @@ DummyInstruction::
     pop hl
     jp EmuLoop
 
+JumpInstruction::
+    pop hl
+    and $0F
+    add HIGH(wBaseMemory)
+    ld h, a
+    ld l, c
+    jp EmuLoop
+
 InstrJumpTable::
     dw DummyInstruction
-    dw DummyInstruction
+    dw JumpInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
