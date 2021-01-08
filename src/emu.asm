@@ -154,6 +154,18 @@ LoadInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; 7xkk - ADD Vx, byte
+; Set Vx = Vx + kk.
+; ------------------------------------------------------------------------------
+AddInstruction::
+    ld a, b
+    call EmuRegRead
+    add c
+    ld [hl], a
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Annn - LD I, addr
 ; Set I = nnn.
 ; ------------------------------------------------------------------------------
@@ -177,7 +189,7 @@ InstrJumpTable::
     dw SkipNotEqualInstruction
     dw SkipEqualRegisterInstruction
     dw LoadInstruction
-    dw DummyInstruction
+    dw AddInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw ILoadInstruction
