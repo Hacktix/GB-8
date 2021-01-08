@@ -2,8 +2,14 @@ INCLUDE "inc/hardware.inc"
 INCLUDE "src/roms.asm"
 INCLUDE "src/ram.asm"
 INCLUDE "src/functions.asm"
+INCLUDE "src/emu.asm"
 
 SECTION "Vectors", ROM0[0]
+    ds $40 - @
+
+VBlankVector::
+    reti 
+
     ds $100 - @
 
 SECTION "Entry Point", ROM0[$100]
@@ -46,5 +52,16 @@ Main::
     ld bc, _end_sysvars - _start_sysvars
     call Zerofill
 
-    jr @
+    ; Initialize Interrupts
+    xor a
+    ldh [rIF], a
+    ld a, IEF_VBLANK
+    ldh [rIE], a
+    ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000
+    ldh [rLCDC], a
+    ei
+
+    ; Initialize system variables and start emulator
+    ld hl, wBaseMemory + $200          ; Load HL (= PC) with base pointer
+    jp EmuLoop
 
