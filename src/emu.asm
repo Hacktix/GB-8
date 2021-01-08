@@ -69,6 +69,28 @@ ReturnInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; 00E0 - CLS
+; Clear the display.
+; ------------------------------------------------------------------------------
+ClearDisplayInstruction::
+    ; TODO: Implement Properly
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; 1nnn - JP addr
+; Jump to location nnn.
+; ------------------------------------------------------------------------------
+JumpInstruction::
+    pop hl
+    ld a, b
+    and $0F
+    add HIGH(wBaseMemory)
+    ld h, a
+    ld l, c
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; 3xkk - SE Vx, byte
 ; Skip next instruction if Vx = kk.
 ; ------------------------------------------------------------------------------
@@ -116,28 +138,6 @@ SkipEqualRegisterInstruction::
     inc hl
     inc hl
 .notEqual
-    jp EmuLoop
-
-; ------------------------------------------------------------------------------
-; 00E0 - CLS
-; Clear the display.
-; ------------------------------------------------------------------------------
-ClearDisplayInstruction::
-    ; TODO: Implement Properly
-    pop hl
-    jp EmuLoop
-
-; ------------------------------------------------------------------------------
-; 1nnn - JP addr
-; Jump to location nnn.
-; ------------------------------------------------------------------------------
-JumpInstruction::
-    pop hl
-    ld a, b
-    and $0F
-    add HIGH(wBaseMemory)
-    ld h, a
-    ld l, c
     jp EmuLoop
     
 ; ------------------------------------------------------------------------------
