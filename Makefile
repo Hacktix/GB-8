@@ -9,7 +9,7 @@ RM_F = rm -f
 
 ASFLAGS = -h
 LDFLAGS = -t -w -n gb8.sym
-FIXFLAGS = -v -p $(PADVAL) -t $(NAME) -c
+FIXFLAGS = -v -p $(PADVAL) -t $(NAME) -C
 
 gb8.gb: gb8.o
 	$(RGBLINK) $(LDFLAGS) -o $@ $^
