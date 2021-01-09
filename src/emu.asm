@@ -6,7 +6,23 @@ SECTION "Emulator Code", ROM0
 EmuLoop::
     ; Wait for VBlank
     halt 
-    nop
+    
+    ; Check if display was updated
+    ld a, [wUpdateDisplay]
+    and a
+    jr z, .noScreenUpdate
+
+    ; Initialize HDMA pointers
+    ld a, HIGH(wBaseVRAM)
+    ldh [rHDMA1], a
+    ld a, LOW(wBaseVRAM)
+    ldh [rHDMA2], a
+    xor a
+    ldh [rHDMA3], a
+    ldh [rHDMA4], a
+    ld a, (wEndVRAM - wBaseVRAM) / $10 - 1
+    ldh [rHDMA5], a
+.noScreenUpdate
 
     ; Read instruction into BC
     ld a, [hli]

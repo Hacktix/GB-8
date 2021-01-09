@@ -52,6 +52,60 @@ Main::
     ld bc, _end_sysvars - _start_sysvars
     call Zerofill
 
+    ; Clear EmuVRAM
+    ld hl, wBaseVRAM
+    ld bc, wEndVRAM - wBaseVRAM
+    call Zerofill
+
+    ; Initialize Palettes
+    ld a, BCPSF_AUTOINC
+    ldh [rBCPS], a
+    xor a
+    ldh [rBCPD], a
+    ldh [rBCPD], a
+
+    ; Zero out VRAM tile data
+    ld hl, $8000
+    ld bc, $01A0
+    call Zerofill
+
+    ; Initialize tiles to $FF
+    ld hl, $9800
+.screenClearLoop
+    ld a, $ff
+    ld [hli], a
+    ld a, h
+    cp $9a
+    jr nz, .screenClearLoop
+    ld a, l
+    cp $34
+    jr nz, .screenClearLoop
+
+    ; Initialize screen section tiles
+    ld hl, $9800
+    xor a
+    ld bc, $0804
+.screenSectionInitLoop
+    ld [hli], a
+    inc a
+    dec b
+    jr nz, .screenSectionInitLoop
+    push af
+    ld a, $18
+    add l
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    pop af
+    ld b, $08
+    dec c
+    jr nz, .screenSectionInitLoop
+
+    ; Set emulator to update VRAM on first frame
+    ld a, 1
+    ld [wUpdateDisplay], a
+
     ; Initialize Interrupts
     xor a
     ldh [rIF], a
