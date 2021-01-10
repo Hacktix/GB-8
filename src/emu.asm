@@ -687,9 +687,9 @@ FJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
+    dw BCDInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw LoadDTInstruction
     dw DummyInstruction
     dw LoadDTInstruction
     dw DummyInstruction
@@ -724,6 +724,60 @@ LoadDTInstruction::
     ld a, b
     call EmuRegRead
     ld [wRegDelay], a
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx33 - LD B, Vx
+; Store BCD representation of Vx in memory locations I, I+1, and I+2.
+; ------------------------------------------------------------------------------
+BCDInstruction::
+    ; Load register value
+    ld a, b
+    call EmuRegRead
+    ld d, a
+
+    ; Load I base pointer
+    ld a, [wRegI+1]
+    ld l, a
+    ld a, [wRegI]
+    and $0F
+    or $C0
+    ld h, a
+
+    ; Initialize BCD region to zero
+    xor a
+    ld [hli], a
+    ld [hli], a
+    ld [hld], a
+    dec hl
+
+    ; Calculate BCD
+    ld a, d
+.hundredsLoop
+    cp 100
+    jr c, .endHundredsLoop
+    inc [hl]
+    sub 100
+    jr .hundredsLoop
+.endHundredsLoop
+    inc hl
+.tensLoop
+    cp 10
+    jr c, .endTensLoop
+    inc [hl]
+    sub 10
+    jr .tensLoop
+.endTensLoop
+    inc hl
+.onesLoop
+    and a
+    jr z, .endOnesLoop
+    inc [hl]
+    dec a
+    jr .onesLoop
+.endOnesLoop
 
     pop hl
     jp EmuLoop
