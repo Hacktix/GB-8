@@ -698,7 +698,7 @@ FJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw IAddInstruction
 
 ; ------------------------------------------------------------------------------
 ; Jumps to the instruction handler for Fxx5 instructions.
@@ -754,6 +754,26 @@ LoadDTInstruction::
     ld a, b
     call EmuRegRead
     ld [wRegDelay], a
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx1E - ADD I, Vx
+; Set I = I + Vx.
+; ------------------------------------------------------------------------------
+IAddInstruction::
+    ld a, b
+    call EmuRegRead
+    ld d, a
+    ld a, [wRegI+1]
+    add d
+    ld [wRegI+1], a
+    jr nc, .noCarry
+    ld a, [wRegI]
+    inc a
+    ld [wRegI], a
+.noCarry
 
     pop hl
     jp EmuLoop
