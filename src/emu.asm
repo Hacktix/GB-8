@@ -12,7 +12,7 @@ EmuLoop::
     and a
     jr z, .noScreenUpdate
 
-    ; Initialize HDMA pointers
+    ; Initialize HDMA
     ld a, HIGH(wBaseVRAM)
     ldh [rHDMA1], a
     ld a, LOW(wBaseVRAM)
@@ -22,6 +22,10 @@ EmuLoop::
     ldh [rHDMA4], a
     ld a, (wEndVRAM - wBaseVRAM) / $10 - 1
     ldh [rHDMA5], a
+
+    ; Reset display update flag
+    xor a
+    ld [wUpdateDisplay], a
 .noScreenUpdate
 
     ; Read instruction into BC
@@ -474,9 +478,166 @@ ILoadInstruction::
 ; Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 ; ------------------------------------------------------------------------------
 DrawInstruction::
-    ; TODO: Actually implement this.
-    ; For now just here to not annoy me with breakpoints from the
-    ; DummyInstruction references.
+    ; Load sprite size into RAM
+    ld a, c
+    and $0F
+    inc a
+    ld [wSpriteSize], a
+
+    ; Load X into B and Y into C
+    ld a, b
+    call EmuRegRead
+    and 63
+    ld b, a
+    ld a, c
+    swap a
+    call EmuRegRead
+    and 31
+    ld c, a
+
+    ; Load HL with VRAM base pointer and add Y-offset
+    ld hl, wBaseVRAM
+    ld e, c       ; Load into E for temporary modification
+    ld a, e
+    and %11111000 ; Divide by 8 for tile-based offset
+    srl a
+    srl a
+    srl a
+    ld e, a
+    inc e
+.baseOffsetLoopY8
+    dec e
+    jr z, .endOffsetY8
+    ld a, l
+    add 128
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    jr .baseOffsetLoopY8
+.endOffsetY8
+    ld a, c
+    and 7         ; Mod 8 for row-based offset
+    add a
+    add l
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+
+    ; Add X-offset to HL
+    ld d, b       ; Load into D for temporary modification
+    ld a, d
+    and %11111000 ; Divide by 8 for tile-based offset
+    srl a
+    srl a
+    srl a
+    ld d, a
+    inc d
+.baseOffsetLoopX8
+    dec d
+    jr z, .endOffsetX8
+    ld a, l
+    add 16
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    jr .baseOffsetLoopX8
+.endOffsetX8
+
+    ; Load bitmask into E
+    ld a, b
+    and 7        ; Mod 7 for pixel-based offset
+    ld d, a
+    ld e, %10000000
+    inc d
+.baseOffsetLoopX1
+    dec d
+    jr z, .endOffsetX1
+    srl e
+    jr .baseOffsetLoopX1
+.endOffsetX1
+
+    ; Load sprite pointer into BC
+    ld a, [wRegI+1]
+    ld c, a
+    ld a, [wRegI]
+    and $0F
+    or $C0
+    ld b, a
+
+    ; XOR sprite into VRAM
+.spriteLoadLoop
+    ld a, [wSprOverflow]
+    and a
+    jr z, .noResetOverflow
+    xor a
+    ld [wSprOverflow], a
+    ld a, l
+    sub 16
+    ld l, a
+    jr nc, .noResetOverflow
+    dec h
+.noResetOverflow
+    ld a, [wSpriteSize]
+    dec a
+    ld [wSpriteSize], a
+    jr z, .endSpriteDraw
+    push de
+    ld a, [bc]
+.spriteXorLoop
+    bit 7, a
+    jr z, .spriteZeroBit ; Bit can be ignored if zero
+    ld d, a
+    ld a, [hl]
+    ; TODO: Check for collision
+    xor e
+    ld [hl], a
+    ld a, d
+.spriteZeroBit
+    srl e
+    jr nz, .noTileSwitchX
+    ; Switch to drawing on next tile (horizontal)
+    ld d, a
+    ld a, 1
+    ld [wSprOverflow], a
+    ld e, %10000000
+    ld a, l
+    add 16
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    ld a, d
+.noTileSwitchX
+    sla a
+    jr nz, .spriteXorLoop
+    ; Run when current sprite byte is fully drawn
+    inc bc
+    inc hl
+    inc hl
+    ld d, a
+    ld a, l
+    and $0F
+    jr nz, .noTileSwitchY
+    ; Switch to drawing on next tile (vertical)
+    ld a, l
+    add 7*16
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+.noTileSwitchY
+    ld a, d
+    pop de
+    jr .spriteLoadLoop
+.endSpriteDraw
+
+    ; Set display update flag
+    ld a, 1
+    ld [wUpdateDisplay], a
+
     pop hl
     jp EmuLoop
 

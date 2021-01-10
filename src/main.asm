@@ -56,6 +56,8 @@ Main::
     ld hl, wBaseVRAM
     ld bc, wEndVRAM - wBaseVRAM
     call Zerofill
+    xor a
+    ld [wSprOverflow], a
 
     ; Initialize Palettes
     ld a, BCPSF_AUTOINC

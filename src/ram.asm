@@ -17,6 +17,8 @@ wStackEnd::
 _end_sysvars:
 
 SECTION "EmuVRAM", WRAM0, ALIGN[4]
-wBaseVRAM::     ds 512
+wBaseVRAM::      ds 512
 wEndVRAM::
-wUpdateDisplay: db
+wSpriteSize::    db
+wSprOverflow::   db
+wUpdateDisplay:: db
