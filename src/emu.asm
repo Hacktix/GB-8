@@ -711,7 +711,7 @@ FJumpTable::
     dw DummyInstruction
     dw F5Instruction
     dw DummyInstruction
-    dw LoadDTInstruction
+    dw LoadRegDTInstruction
     dw DummyInstruction
     dw LoadDigitPtrInstruction
     dw DummyInstruction
