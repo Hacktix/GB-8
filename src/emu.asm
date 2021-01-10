@@ -728,7 +728,7 @@ F5JumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw StoreRegistersInstruction
-    dw DummyInstruction
+    dw LoadRegistersInstruction
 
 ; ------------------------------------------------------------------------------
 ; Fx07 - LD Vx, DT
@@ -817,7 +817,6 @@ BCDInstruction::
 ; Store registers V0 through Vx in memory starting at location I.
 ; ------------------------------------------------------------------------------
 StoreRegistersInstruction::
-    ld b, b
     ; Load I base pointer
     ld a, [wRegI+1]
     ld l, a
@@ -828,11 +827,43 @@ StoreRegistersInstruction::
 
     ; Store register values in EmuRAM
     ld de, wRegV
-    ld b, $10
+    ld a, b
+    and $0F
+    inc a
+    ld b, a
 .storeLoop
     ld a, [de]
     inc de
     ld [hli], a
+    dec b
+    jr nz, .storeLoop
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx65 - LD Vx, [I]
+; Read registers V0 through Vx from memory starting at location I.
+; ------------------------------------------------------------------------------
+LoadRegistersInstruction::
+    ; Load I base pointer
+    ld a, [wRegI+1]
+    ld l, a
+    ld a, [wRegI]
+    and $0F
+    or $C0
+    ld h, a
+
+    ; Store register values in EmuRAM
+    ld de, wRegV
+    ld a, b
+    and $0F
+    inc a
+    ld b, a
+.storeLoop
+    ld a, [hli]
+    ld [de], a
+    inc de
     dec b
     jr nz, .storeLoop
 
