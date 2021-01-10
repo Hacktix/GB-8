@@ -656,6 +656,58 @@ DrawInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; Jumps to the instruction handler for Fxxx instructions.
+; ------------------------------------------------------------------------------
+FInstruction::
+    ld a, c
+    and $0F
+    add LOW(FJumpTable)
+    ld l, a
+    adc HIGH(FJumpTable)
+    sub l
+    ld h, a
+
+    ld a, [hli]
+    ld e, a
+    ld a, [hl]
+    ld h, a
+    ld l, e
+    jp hl
+
+FJumpTable::
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw LoadDTInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+
+; ------------------------------------------------------------------------------
+; Fx07 - LD Vx, DT
+; Set Vx = delay timer value.
+; ------------------------------------------------------------------------------
+LoadRegDTInstruction::
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, [wRegDelay]
+    ld [hl], a
+    
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Table containing jump vectors related to the upper 4 bits of the instruction.
 ; ------------------------------------------------------------------------------
 InstrJumpTable::
@@ -674,7 +726,7 @@ InstrJumpTable::
     dw DummyInstruction
     dw DrawInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw FInstruction
 
 ; ------------------------------------------------------------------------------
 ; Stores the value of emulated register V[A & $0F] in register A.
