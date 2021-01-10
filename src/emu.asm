@@ -689,11 +689,42 @@ FJumpTable::
     dw DummyInstruction
     dw BCDInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw F5Instruction
     dw DummyInstruction
     dw LoadDTInstruction
     dw DummyInstruction
     dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+    dw DummyInstruction
+
+; ------------------------------------------------------------------------------
+; Jumps to the instruction handler for Fxx5 instructions.
+; ------------------------------------------------------------------------------
+F5Instruction::
+    ld b, b
+    ld a, c
+    swap a
+    and $0F
+    add a
+    add LOW(F5JumpTable)
+    ld l, a
+    adc HIGH(F5JumpTable)
+    sub l
+    ld h, a
+
+    ld a, [hli]
+    ld e, a
+    ld a, [hl]
+    ld h, a
+    ld l, e
+    jp hl
+
+F5JumpTable::
+    dw DummyInstruction
+    dw LoadDTInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
