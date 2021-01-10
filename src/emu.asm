@@ -661,6 +661,7 @@ DrawInstruction::
 FInstruction::
     ld a, c
     and $0F
+    add a
     add LOW(FJumpTable)
     ld l, a
     adc HIGH(FJumpTable)
@@ -680,7 +681,7 @@ FJumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw LoadDTInstruction
     dw DummyInstruction
     dw LoadDTInstruction
     dw DummyInstruction
@@ -703,7 +704,19 @@ LoadRegDTInstruction::
     ld h, a
     ld a, [wRegDelay]
     ld [hl], a
-    
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx15 - LD DT, Vx
+; Set delay timer = Vx.
+; ------------------------------------------------------------------------------
+LoadDTInstruction::
+    ld a, b
+    call EmuRegRead
+    ld [wRegDelay], a
+
     pop hl
     jp EmuLoop
 
