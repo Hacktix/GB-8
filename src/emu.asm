@@ -496,6 +496,26 @@ ILoadInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; Cxkk - RND Vx, byte
+; Set Vx = random byte AND kk.
+; ------------------------------------------------------------------------------
+RandomInstruction::
+    ld a, b
+    and $0F
+    ld l, a
+    ld h, HIGH(wRegV)
+
+    ld a, c
+    and $0F
+    ld d, a
+    ldh a, [rDIV]
+    and d
+    ld [hl], a
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Dxyn - DRW Vx, Vy, nibble
 ; Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 ; ------------------------------------------------------------------------------
@@ -906,7 +926,7 @@ InstrJumpTable::
     dw SkipNotEqualRegisterInstruction
     dw ILoadInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw RandomInstruction
     dw DrawInstruction
     dw DummyInstruction
     dw FInstruction
