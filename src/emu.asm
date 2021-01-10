@@ -704,7 +704,6 @@ FJumpTable::
 ; Jumps to the instruction handler for Fxx5 instructions.
 ; ------------------------------------------------------------------------------
 F5Instruction::
-    ld b, b
     ld a, c
     swap a
     and $0F
@@ -728,7 +727,7 @@ F5JumpTable::
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw StoreRegistersInstruction
     dw DummyInstruction
 
 ; ------------------------------------------------------------------------------
@@ -809,6 +808,33 @@ BCDInstruction::
     dec a
     jr .onesLoop
 .endOnesLoop
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx55 - LD [I], Vx
+; Store registers V0 through Vx in memory starting at location I.
+; ------------------------------------------------------------------------------
+StoreRegistersInstruction::
+    ld b, b
+    ; Load I base pointer
+    ld a, [wRegI+1]
+    ld l, a
+    ld a, [wRegI]
+    and $0F
+    or $C0
+    ld h, a
+
+    ; Store register values in EmuRAM
+    ld de, wRegV
+    ld b, $10
+.storeLoop
+    ld a, [de]
+    inc de
+    ld [hli], a
+    dec b
+    jr nz, .storeLoop
 
     pop hl
     jp EmuLoop
