@@ -51,6 +51,8 @@ Main::
     ld hl, _start_sysvars
     ld bc, _end_sysvars - _start_sysvars
     call Zerofill
+    xor a
+    ld [wCycleBuf], a
 
     ; Clear EmuVRAM
     ld hl, wBaseVRAM

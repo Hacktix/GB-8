@@ -4,8 +4,17 @@ SECTION "Emulator Code", ROM0
 ; frame.
 ; ------------------------------------------------------------------------------
 EmuLoop::
+    ; Check if cycles per frame have been exhausted
+    ld a, [wCycleBuf]
+    and a
+    jr nz, .noScreenUpdate
+
     ; Wait for VBlank
     halt 
+
+    ; Reset cycle buffer
+    ld a, 40
+    ld [wCycleBuf], a
     
     ; Check if display was updated
     ld a, [wUpdateDisplay]
@@ -52,6 +61,11 @@ EmuLoop::
     ld a, [hl]
     ld h, a
     ld l, e
+
+    ; Decrement cycle buffer
+    ld a, [wCycleBuf]
+    dec a
+    ld [wCycleBuf], a
 
     ; Jump to instruction routine
     jp hl

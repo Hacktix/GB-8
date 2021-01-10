@@ -14,6 +14,9 @@ wSP::         db
 wStack::      ds 32
 wStackEnd::
 
+; Other
+wCycleBuf::   db
+
 _end_sysvars:
 
 SECTION "EmuVRAM", WRAM0, ALIGN[4]
