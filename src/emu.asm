@@ -12,6 +12,14 @@ EmuLoop::
     ; Wait for VBlank
     halt 
 
+    ; Update Delay Timer
+    ld a, [wRegDelay]
+    and a
+    jr z, .zeroDT
+    dec a
+    ld [wRegDelay], a
+.zeroDT
+
     ; Reset cycle buffer
     ld a, 40
     ld [wCycleBuf], a
