@@ -21,5 +21,5 @@ EndFontset:
 
 ; Hardcoded included binary file - TODO: allow multiple
 TestROM:
-INCBIN "inc/test_opcode.ch8"
+INCBIN "inc/BC_test.ch8"
 EndTestROM:
