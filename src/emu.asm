@@ -21,7 +21,7 @@ EmuLoop::
 .zeroDT
 
     ; Reset cycle buffer
-    ld a, 1
+    ld a, CyclesPerFrame
     ld [wCycleBuf], a
     
     ; Check if display was updated

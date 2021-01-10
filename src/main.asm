@@ -1,4 +1,6 @@
 INCLUDE "inc/hardware.inc"
+INCLUDE "inc/GB8.inc"
+
 INCLUDE "src/roms.asm"
 INCLUDE "src/ram.asm"
 INCLUDE "src/functions.asm"
