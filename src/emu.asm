@@ -94,6 +94,11 @@ ZeroByteInstruction::
     ld a, c
     cp $E0
     jr z, ClearDisplayInstruction
+    cp $EE
+    jr z, ReturnInstruction
+
+    pop hl
+    jp EmuLoop
 
 ; ------------------------------------------------------------------------------
 ; 00EE - RET
