@@ -713,7 +713,7 @@ FJumpTable::
     dw DummyInstruction
     dw LoadDTInstruction
     dw DummyInstruction
-    dw DummyInstruction
+    dw LoadDigitPtrInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -794,6 +794,37 @@ IAddInstruction::
     inc a
     ld [wRegI], a
 .noCarry
+
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx29 - LD F, Vx
+; Set I = location of sprite for digit Vx.
+; ------------------------------------------------------------------------------
+LoadDigitPtrInstruction::
+    ld a, b
+    call EmuRegRead
+
+    ld de, $0000
+    and a
+    jr z, .endDigitSearchLoop
+    ld b, a
+.digitSearchLoop
+    ld a, 5
+    add e
+    ld e, a
+    adc d
+    sub e
+    ld d, a
+    dec b
+    jr nz, .digitSearchLoop
+.endDigitSearchLoop
+
+    ld a, d
+    ld [wRegI], a
+    ld a, e
+    ld [wRegI+1], a
 
     pop hl
     jp EmuLoop
