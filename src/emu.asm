@@ -21,7 +21,7 @@ EmuLoop::
 .zeroDT
 
     ; Reset cycle buffer
-    ld a, 40
+    ld a, 1
     ld [wCycleBuf], a
     
     ; Check if display was updated
@@ -115,7 +115,16 @@ ReturnInstruction::
 ; Clear the display.
 ; ------------------------------------------------------------------------------
 ClearDisplayInstruction::
-    ; TODO: Implement Properly
+    ld hl, wBaseVRAM
+    ld bc, wEndVRAM - wBaseVRAM
+.clsLoop
+    xor a
+    ld [hli], a
+    dec bc
+    ld a, b
+    or c
+    jr nz, .clsLoop
+
     pop hl
     jp EmuLoop
 
