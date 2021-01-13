@@ -26,7 +26,7 @@ Pong::
 db "Pong (1P)", 0
 
 ; Button Mapping
-db $FF, $FF, $FF, $FF, $01, $04, $FF, $FF
+db $FF, $FF, $FF, $FF, $04, $01, $FF, $FF
 
 ; ROM Size
 dw pongDataEnd - pongData
