@@ -94,7 +94,7 @@ Main::
     ldh [rAUDENA], a
 
     ; Load ROM File
-    ld hl, Airplane
+    ld hl, Blinky
     call InitROM
 
     ; Set emulator to update VRAM on first frame

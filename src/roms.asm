@@ -54,6 +54,24 @@ airplaneData:
 INCBIN "inc/roms/Airplane.ch8"
 airplaneDataEnd:
 
+; ------------------------------------------------------------------------------
+; Blinky
+; ------------------------------------------------------------------------------
+Blinky::
+; ROM Title
+db "Blinky", 0
+
+; Button Mapping
+db $FF, $FF, $FF, $FF, $06, $03, $07, $08
+
+; ROM Size
+dw blinkyDataEnd - blinkyData
+
+; ROM Data
+blinkyData:
+INCBIN "inc/roms/Blinky.ch8"
+blinkyDataEnd:
+
 
 
 
