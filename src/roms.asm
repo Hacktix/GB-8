@@ -36,6 +36,24 @@ pongData:
 INCBIN "inc/Pong.ch8"
 pongDataEnd:
 
+; ------------------------------------------------------------------------------
+; Airplane
+; ------------------------------------------------------------------------------
+Airplane::
+; ROM Title
+db "Airplane", 0
+
+; Button Mapping
+db $FF, $FF, $08, $08, $FF, $FF, $FF, $FF
+
+; ROM Size
+dw airplaneDataEnd - airplaneData
+
+; ROM Data
+airplaneData:
+INCBIN "inc/Airplane.ch8"
+airplaneDataEnd:
+
 
 
 

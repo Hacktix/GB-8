@@ -94,7 +94,7 @@ Main::
     ldh [rAUDENA], a
 
     ; Load ROM File
-    ld hl, Pong
+    ld hl, Airplane
     call InitROM
 
     ; Set emulator to update VRAM on first frame
