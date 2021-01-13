@@ -543,77 +543,59 @@ DrawInstruction::
     ; Load X into B and Y into C
     ld a, b
     call EmuRegRead
-    and 63
+    and 63              ; Wrap X-coordinate around 64
     ld b, a
     ld a, c
     swap a
     call EmuRegRead
-    and 31
+    and 31              ; Wrap Y-coordinate around 32
     ld c, a
 
-    ; Load HL with VRAM base pointer and add Y-offset
+    ; Load HL with VRAM base pointer
     ld hl, wBaseVRAM
-    ld e, c       ; Load into E for temporary modification
-    ld a, e
-    and %11111000 ; Divide by 8 for tile-based offset
-    srl a
-    srl a
-    srl a
-    ld e, a
-    inc e
-.baseOffsetLoopY8
-    dec e
-    jr z, .endOffsetY8
-    ld a, l
-    add 128
-    ld l, a
-    adc h
-    sub l
-    ld h, a
-    jr .baseOffsetLoopY8
-.endOffsetY8
+
+    ; Add Y-offset (tile-granularity)
     ld a, c
-    and 7         ; Mod 8 for row-based offset
+    and %11111100         ; Divide Y-position by 4
+    srl a
+    srl a
+    add h                 ; Add to H (one tile down = +256 bytes in VRAM)
+    ld h, a
+
+    ; Add Y-offset (line-granularity)
+    ld a, c
+    and %00000011         ; Modulo Y-position by 4
+    add a                 ; Multiply by 4 (one emulated pixel row = 4 bytes)
     add a
-    add l
+    add l                 ; Add to HL
     ld l, a
     adc h
     sub l
     ld h, a
 
-    ; Add X-offset to HL
-    ld d, b       ; Load into D for temporary modification
-    ld a, d
-    and %11111000 ; Divide by 8 for tile-based offset
-    srl a
-    srl a
-    srl a
-    ld d, a
-    inc d
-.baseOffsetLoopX8
-    dec d
-    jr z, .endOffsetX8
-    ld a, l
-    add 16
-    ld l, a
-    adc h
-    sub l
-    ld h, a
-    jr .baseOffsetLoopX8
-.endOffsetX8
-
-    ; Load bitmask into E
+    ; Add X-offset (tile-granularity)
     ld a, b
-    and 7        ; Mod 7 for pixel-based offset
+    and %11111100         ; Integer-Divide X-position by 4 and implicitly multiply by 4
+    sla a                 ; Multiply by 4 (total factor 16, since 16 bytes = one tile horizontally)
+    sla a
+    add l                 ; Add to HL
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+
+    ; Initialize bitmask in E and add X-offset (pixel-granularity)
+    ld e, %11000000
+    ld a, b
+    and %00000011          ; Modulo X-position by 4
+    jr z, .skipBitmaskInit
     ld d, a
-    ld e, %10000000
-    inc d
-.baseOffsetLoopX1
-    dec d
-    jr z, .endOffsetX1
+.bitmaskInitLoop           ; Shift right twice for each pixel
     srl e
-    jr .baseOffsetLoopX1
-.endOffsetX1
+    srl e
+    dec d
+    jr nz, .bitmaskInitLoop
+.skipBitmaskInit
 
     ; Load sprite pointer into BC
     ld a, [wRegI+1]
@@ -623,71 +605,101 @@ DrawInstruction::
     or $C0
     ld b, a
 
-    ; XOR sprite into VRAM
-.spriteLoadLoop
-    ld a, [wSprOverflow]
-    and a
-    jr z, .noResetOverflow
-    xor a
-    ld [wSprOverflow], a
-    ld a, l
-    sub 16
-    ld l, a
-    jr nc, .noResetOverflow
-    dec h
-.noResetOverflow
+.spriteDrawLoop
+
+    ; Decrement sprite size and exit loop if all bytes drawn
     ld a, [wSpriteSize]
     dec a
     ld [wSpriteSize], a
     jr z, .endSpriteDraw
+
+    ; Preserve X-offset bitmask and load sprite data byte
     push de
     ld a, [bc]
-.spriteXorLoop
+
+.lineRenderLoop
+
+    ; Preserve rendering bits in D, check if currently rendering bit is set, skip if not
+    ld d, a
     bit 7, a
-    jr z, .spriteZeroBit ; Bit can be ignored if zero
-    ld d, a
+    jr z, .spriteZeroBit
+
+    ; Load VRAM byte and XOR
     ld a, [hl]
-    ; TODO: Check for collision
     xor e
-    ld [hl], a
-    ld a, d
+
+    ; Load XOR result into HL-row and next row (for 2x2 pixels)
+    ld [hli], a
+    inc hl
+    ld [hld], a
+    dec hl
+
 .spriteZeroBit
+
+    ; Shift bitmask right by 2 and check for X-overflow
     srl e
-    jr nz, .noTileSwitchX
-    ; Switch to drawing on next tile (horizontal)
-    ld d, a
-    ld a, 1
-    ld [wSprOverflow], a
-    ld e, %10000000
-    ld a, l
+    srl e
+    jr nz, .noRenderOverflowX
+
+    ; Add 16 to X-offset in RAM and HL
+    ld a, [wSprOverflow]
     add 16
+    ld [wSprOverflow], a
+    ld a, 16
+    add l
     ld l, a
     adc h
     sub l
     ld h, a
+
+    ; Reset bitmask
+    ld e, %11000000
+
+.noRenderOverflowX
+
+    ; Restore rendering bits and shift left, render next bit if any left
     ld a, d
-.noTileSwitchX
     sla a
-    jr nz, .spriteXorLoop
-    ; Run when current sprite byte is fully drawn
-    inc bc
+    jr nz, .lineRenderLoop
+
+    ; If byte is fully drawn, increment pointers accordingly
+    inc bc        ; Next byte of sprite in RAM
+    inc hl        ; Two rows further down, 1 row = 2 bytes => +4
     inc hl
     inc hl
-    ld d, a
+    inc hl
+
+    ; Check if tile boundary was reached, skip adjustments if not
     ld a, l
     and $0F
-    jr nz, .noTileSwitchY
-    ; Switch to drawing on next tile (vertical)
-    ld a, l
-    add 7*16
+    jr nz, .noRenderOverflowY
+
+    ; Switch to next tile
+    ld a, 15*16
+    add l
     ld l, a
     adc h
     sub l
     ld h, a
-.noTileSwitchY
-    ld a, d
+
+.noRenderOverflowY
+
+    ; Reset X-Tile-Overflow
+    ld a, [wSprOverflow]
+    ld d, a
+    ld a, l
+    sub d
+    ld l, a
+    jr nc, .noOverflowResetBorrow
+    dec h
+.noOverflowResetBorrow
+    xor a
+    ld [wSprOverflow], a
+
+    ; Reset bitmask for new row and draw new line
     pop de
-    jr .spriteLoadLoop
+    jr .spriteDrawLoop
+
 .endSpriteDraw
 
     ; Set display update flag

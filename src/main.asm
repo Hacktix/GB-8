@@ -88,23 +88,23 @@ Main::
     jr nz, .screenClearLoop
 
     ; Initialize screen section tiles
-    ld hl, $9800
+    ld hl, $9822
     xor a
-    ld bc, $0804
+    ld bc, $1008
 .screenSectionInitLoop
     ld [hli], a
     inc a
     dec b
     jr nz, .screenSectionInitLoop
     push af
-    ld a, $18
+    ld a, $10
     add l
     ld l, a
     adc h
     sub l
     ld h, a
     pop af
-    ld b, $08
+    ld b, $10
     dec c
     jr nz, .screenSectionInitLoop
 
