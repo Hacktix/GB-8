@@ -33,7 +33,7 @@ dw pongDataEnd - pongData
 
 ; ROM Data
 pongData:
-INCBIN "inc/Pong.ch8"
+INCBIN "inc/roms/Pong.ch8"
 pongDataEnd:
 
 ; ------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ dw airplaneDataEnd - airplaneData
 
 ; ROM Data
 airplaneData:
-INCBIN "inc/Airplane.ch8"
+INCBIN "inc/roms/Airplane.ch8"
 airplaneDataEnd:
 
 
