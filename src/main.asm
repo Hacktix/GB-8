@@ -30,25 +30,6 @@ Main::
     xor a
     ld [rLCDC], a
 
-    ; Load Fontset into memory
-    ld hl, wBaseMemory
-    ld de, Fontset
-    ld bc, EndFontset - Fontset
-    call Memcpy
-
-    ; Fill memory with zero up to $200
-    ld bc, ($200 - (EndFontset - Fontset))
-    call Zerofill
-
-    ; Load ROM into memory
-    ld de, TestROM
-    ld bc, EndTestROM - TestROM
-    call Memcpy
-
-    ; Fill rest of memory with zero
-    ld bc, ($1000 - $200 - (TestROM - EndTestROM))
-    call Zerofill
-
     ; Clear system variables
     ld hl, _start_sysvars
     ld bc, _end_sysvars - _start_sysvars
@@ -107,6 +88,10 @@ Main::
     ld b, $10
     dec c
     jr nz, .screenSectionInitLoop
+
+    ; Load ROM File
+    ld hl, Pong
+    call InitROM
 
     ; Set emulator to update VRAM on first frame
     ld a, 1

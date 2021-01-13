@@ -4,18 +4,21 @@ wBaseMemory:: ds $1000
 _start_sysvars:
 
 ; Register Pointers
-wRegV::       ds 16
-wRegI::       dw
-wRegDelay::   db
-wRegSound::   db
+wRegV::         ds 16
+wRegI::         dw
+wRegDelay::     db
+wRegSound::     db
 
 ; Stack
-wSP::         db
-wStack::      ds 32
+wSP::           db
+wStack::        ds 32
 wStackEnd::
 
+; Input
+wInputMaskMap:: ds 16
+
 ; Other
-wCycleBuf::   db
+wCycleBuf::     db
 
 _end_sysvars:
 
