@@ -19,7 +19,7 @@ wCycleBuf::   db
 
 _end_sysvars:
 
-SECTION "EmuVRAM", WRAM0, ALIGN[4]
+SECTION "EmuVRAM", WRAM0, ALIGN[8]
 wBaseVRAM::      ds 2048
 wEndVRAM::
 wSpriteSize::    db

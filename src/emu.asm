@@ -680,6 +680,17 @@ DrawInstruction::
     ld l, a
     adc h
     sub l
+
+    ; Check for overflow
+    cp HIGH(wBaseVRAM + $800)
+    jr nz, .noFrameOverflow
+
+    ; Subract $800 from HL
+    sub 8
+
+.noFrameOverflow
+
+    ; Store A in H register
     ld h, a
 
 .noRenderOverflowY
