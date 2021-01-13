@@ -89,6 +89,10 @@ Main::
     dec c
     jr nz, .screenSectionInitLoop
 
+    ; Turn off Audio initially
+    ld a, AUDENA_OFF
+    ldh [rAUDENA], a
+
     ; Load ROM File
     ld hl, Pong
     call InitROM

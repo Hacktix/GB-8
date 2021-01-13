@@ -36,6 +36,19 @@ EmuLoop::
     ld [wRegDelay], a
 .zeroDT
 
+    ; Update Sound Timer
+    ld a, [wRegSound]
+    and a
+    jr z, .skipUpdateST
+    dec a
+    ld [wRegSound], a
+    jr nz, .skipUpdateST    ; Don't disable sound if sound timer not zero
+
+    ; Disable Sound
+    ld a, AUDENA_OFF
+    ldh [rAUDENA], a
+.skipUpdateST
+
     ; Reset cycle buffer
     ld a, CyclesPerFrame
     ld [wCycleBuf], a
@@ -813,7 +826,7 @@ FJumpTable::
     dw F5Instruction
     dw DummyInstruction
     dw LoadRegDTInstruction
-    dw DummyInstruction
+    dw LoadSTInstruction
     dw LoadDigitPtrInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -864,6 +877,35 @@ LoadRegDTInstruction::
     ld a, [wRegDelay]
     ld [hl], a
 
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx18 - LD ST, Vx
+; Set sound timer = Vx.
+; ------------------------------------------------------------------------------
+LoadSTInstruction::
+    ld a, b
+    call EmuRegRead
+    ld [wRegSound], a
+    and a
+    jr z, .skipEnableSound
+
+    ; Enable Audio Output
+    ld a, AUDENA_ON
+    ldh [rAUDENA], a
+    ld a, $FF
+    ldh [rAUDVOL], a
+    ldh [rAUDTERM], a
+    ldh [rNR22], a
+    ld a, %10000000
+    ldh [rNR21], a
+    xor a
+    ldh [rNR23], a
+    ld a, %10000100
+    ldh [rNR24], a
+
+.skipEnableSound
     pop hl
     jp EmuLoop
 
