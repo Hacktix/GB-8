@@ -29,7 +29,6 @@ Zerofill::
 ; for it.
 ; ------------------------------------------------------------------------------
 InitROM::
-    ld b, b
     ; Loop until string-terminating zero-byte is reached
     ld a, [hli]
     and a
