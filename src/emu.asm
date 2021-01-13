@@ -50,7 +50,7 @@ EmuLoop::
 .skipUpdateST
 
     ; Reset cycle buffer
-    ld a, CyclesPerFrame
+    ld a, [wCycleLimit]
     ld [wCycleBuf], a
     
     ; Check if display was updated

@@ -34,6 +34,10 @@ InitROM::
     and a
     jr nz, InitROM
 
+    ; Load emulation speed into RAM
+    ld a, [hli]
+    ld [wCycleLimit], a
+
     ; Load Button Mapping into RAM
     ld c, 8
     ld b, %10000000

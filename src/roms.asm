@@ -4,9 +4,15 @@ SECTION "ROM Files", ROM0
 ; 
 ; * Structure:
 ;  db "<ROM_NAME>", 0
+;  db <EMULATION_SPEED>
 ;  db <BUTTON_MAPPING>
 ;  dw <ROM_SIZE>
 ;  INCBIN "inc/roms/<FILENAME>"
+;
+; * Emulation Speed:
+;  A single byte determining how many cycles to emulate per frame. The
+;  recommended maximum is 40, but may vary between different ROMs. Too high
+;  speeds may cause graphical errors.
 ;
 ; * Button Mapping:
 ;  Always 8 bytes. Each byte has an assigned button (see below).
@@ -24,6 +30,9 @@ SECTION "ROM Files", ROM0
 Pong::
 ; ROM Title
 db "Pong (1P)", 0
+
+; Emulation Speed
+db 15
 
 ; Button Mapping
 db $FF, $FF, $FF, $FF, $04, $01, $FF, $FF
@@ -43,6 +52,9 @@ Airplane::
 ; ROM Title
 db "Airplane", 0
 
+; Emulation Speed
+db 12
+
 ; Button Mapping
 db $FF, $FF, $08, $08, $FF, $FF, $FF, $FF
 
@@ -60,6 +72,9 @@ airplaneDataEnd:
 Blinky::
 ; ROM Title
 db "Blinky", 0
+
+; Emulation Speed
+db 20
 
 ; Button Mapping
 db $FF, $FF, $FF, $FF, $06, $03, $07, $08

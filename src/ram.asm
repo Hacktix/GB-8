@@ -20,6 +20,7 @@ wInputData::    db
 
 ; Other
 wCycleBuf::     db
+wCycleLimit::   db
 
 _end_sysvars:
 
