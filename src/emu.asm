@@ -12,6 +12,22 @@ EmuLoop::
     ; Wait for VBlank
     halt 
 
+    ; Update Input Register
+    ld a, P1F_GET_BTN
+    ldh [rP1], a
+    ldh a, [rP1]
+    cpl
+    and $0F
+    swap a
+    ld d, a
+    ld a, P1F_GET_DPAD
+    ldh [rP1], a
+    ldh a, [rP1]
+    cpl
+    and $0F
+    or d
+    ld [wInputData], a
+
     ; Update Delay Timer
     ld a, [wRegDelay]
     and a
@@ -721,6 +737,54 @@ DrawInstruction::
     jp EmuLoop
 
 ; ------------------------------------------------------------------------------
+; Handles both of the following instructions:
+;
+; Ex9E - SKP Vx
+; Skip next instruction if key with the value of Vx is pressed.
+;
+; ExA1 - SKNP Vx
+; Skip next instruction if key with the value of Vx is not pressed.
+; ------------------------------------------------------------------------------
+InputSkipInstruction::
+    ld a, b
+    call EmuRegRead
+
+    ; Load Input Mask byte pointer
+    add LOW(wInputMaskMap)
+    ld l, a
+    adc HIGH(wInputMaskMap)
+    sub l
+    ld h, a
+
+    ; Load input state and check if button is pressed
+    ; Zero Flag set = no, otherwise yes
+    ld a, [wInputData]
+    and [hl]
+    jr nz, .isPressed
+
+.notPressed
+    ld a, c
+    cp $9E
+    jr z, .noSkipInstruction
+    jr .skipInstruction
+
+.isPressed
+    ld a, c
+    cp $9E
+    jr z, .skipInstruction
+    jr .noSkipInstruction
+
+.skipInstruction
+    pop hl
+    inc hl
+    inc hl
+    jp EmuLoop
+
+.noSkipInstruction
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
 ; Jumps to the instruction handler for Fxxx instructions.
 ; ------------------------------------------------------------------------------
 FInstruction::
@@ -996,7 +1060,7 @@ InstrJumpTable::
     dw DummyInstruction
     dw RandomInstruction
     dw DrawInstruction
-    dw DummyInstruction
+    dw InputSkipInstruction
     dw FInstruction
 
 ; ------------------------------------------------------------------------------

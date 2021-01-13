@@ -16,6 +16,7 @@ wStackEnd::
 
 ; Input
 wInputMaskMap:: ds 16
+wInputData::    db
 
 ; Other
 wCycleBuf::     db
