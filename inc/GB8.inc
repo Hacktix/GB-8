@@ -1,1 +1,1 @@
-CyclesPerFrame EQU 40
+CyclesPerFrame EQU 15
