@@ -108,6 +108,27 @@ caveData:
 INCBIN "inc/roms/Cave.ch8"
 caveDataEnd:
 
+; ------------------------------------------------------------------------------
+; Fall
+; ------------------------------------------------------------------------------
+Fall::
+; ROM Title
+db "Fall", 0
+
+; Emulation Speed
+db 25
+
+; Button Mapping
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+; ROM Size
+dw fallDataEnd - fallData
+
+; ROM Data
+fallData:
+INCBIN "inc/roms/fall.bin"
+fallDataEnd:
+
 
 
 
