@@ -18,7 +18,7 @@ SECTION "ROM Files", ROM0
 ;  Always 8 bytes. Each byte has an assigned button (see below).
 ;  Pressing the assigned button is interpreted as pressing the button with
 ;  the value of the byte. Any value greater than $F is interpreted as an
-;  unassigned button.
+;  unassigned button. Duplicate mappings are not allowed.
 ; 
 ;  Button Mapping bytes in order:
 ;  Start, Select, B, A, DPad Down, DPad Up, DPad Left, DPad Right
@@ -98,7 +98,7 @@ db "Cave", 0
 db 10
 
 ; Button Mapping
-db $0F, $0F, $FF, $FF, $08, $02, $04, $06
+db $0F, $FF, $FF, $FF, $08, $02, $04, $06
 
 ; ROM Size
 dw caveDataEnd - caveData
