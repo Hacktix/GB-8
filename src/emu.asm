@@ -634,6 +634,10 @@ DrawInstruction::
     or $C0
     ld b, a
 
+    ; Initialize VF to zero
+    xor a
+    ld [wRegV+$F], a
+
 .spriteDrawLoop
 
     ; Decrement sprite size and exit loop if all bytes drawn
@@ -653,7 +657,10 @@ DrawInstruction::
     bit 7, a
     jr z, .spriteZeroBit
 
-    ; Load VRAM byte and XOR
+    ; Load VRAM byte, push collision check and XOR
+    ld a, [hl]
+    and e
+    push af           ; Zero flag unset if collision detected
     ld a, [hl]
     xor e
 
@@ -662,6 +669,12 @@ DrawInstruction::
     inc hl
     ld [hld], a
     dec hl
+
+    ; Check collision and update VF
+    pop af
+    jr z, .spriteZeroBit
+    ld a, 1
+    ld [wRegV+$F], a
 
 .spriteZeroBit
 
