@@ -93,7 +93,7 @@ Main::
     ldh [rAUDENA], a
 
     ; Load ROM File
-    ld hl, Blinky
+    ld hl, Cave
     call InitROM
 
     ; Set emulator to update VRAM on first frame

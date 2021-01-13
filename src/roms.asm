@@ -87,6 +87,27 @@ blinkyData:
 INCBIN "inc/roms/Blinky.ch8"
 blinkyDataEnd:
 
+; ------------------------------------------------------------------------------
+; Cave
+; ------------------------------------------------------------------------------
+Cave::
+; ROM Title
+db "Cave", 0
+
+; Emulation Speed
+db 10
+
+; Button Mapping
+db $0F, $0F, $FF, $FF, $08, $02, $04, $06
+
+; ROM Size
+dw caveDataEnd - caveData
+
+; ROM Data
+caveData:
+INCBIN "inc/roms/Cave.ch8"
+caveDataEnd:
+
 
 
 
