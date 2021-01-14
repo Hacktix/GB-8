@@ -29,4 +29,5 @@ wBaseVRAM::      ds 2048
 wEndVRAM::
 wSpriteSize::    db
 wSprOverflow::   db
+wSprOverflowY::  db
 wUpdateDisplay:: db

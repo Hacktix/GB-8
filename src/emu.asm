@@ -690,10 +690,13 @@ DrawInstruction::
     ld a, 16
     add l
     ld l, a
-    adc h
-    sub l
-    ld h, a
+    jr nc, .noHorizontalOverflow
 
+    ; Account for horizontal overflow
+    ld a, 1
+    ld [wSprOverflowY], a
+
+.noHorizontalOverflow
     ; Reset bitmask
     ld e, %11000000
 
@@ -748,6 +751,15 @@ DrawInstruction::
 .noOverflowResetBorrow
     xor a
     ld [wSprOverflow], a
+
+    ; Account for horizontal frame overflow
+    ld a, [wSprOverflowY]
+    and a
+    jr z, .noResetHorizontalFrameOverflow
+    inc h
+    xor a
+    ld [wSprOverflowY], a
+.noResetHorizontalFrameOverflow
 
     ; Reset bitmask for new row and draw new line
     pop de
