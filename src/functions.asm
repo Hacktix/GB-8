@@ -24,6 +24,20 @@ Zerofill::
     jr nz, Zerofill
     ret
 
+PrintString::
+    ld a, [de]
+    inc de
+    and a
+    ret z
+    cp $20
+    jr nz, .noSpace
+    inc hl
+    jr PrintString
+.noSpace
+    add $50
+    ld [hli], a
+    jr PrintString
+
 ; ------------------------------------------------------------------------------
 ; Starts reading a ROM file entry at HL and initializes the emulator
 ; for it.

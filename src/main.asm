@@ -49,6 +49,12 @@ Main::
     xor a
     ldh [rBCPD], a
     ldh [rBCPD], a
+    dec a
+    ldh [rBCPD], a
+    ldh [rBCPD], a
+    inc a
+    ldh [rBCPD], a
+    ldh [rBCPD], a
 
     ; Zero out VRAM tile data
     ld hl, $8000
@@ -88,6 +94,16 @@ Main::
     dec c
     jr nz, .screenSectionInitLoop
 
+    ; Load Font Tiles
+    ld hl, $8800
+    ld de, fontNumbers
+    ld bc, endFontNumbers - fontNumbers
+    call Memcpy
+    ld hl, $8910
+    ld de, fontLetters
+    ld bc, endFontLetters - fontLetters
+    call Memcpy
+
     ; Turn off Audio initially
     ld a, AUDENA_OFF
     ldh [rAUDENA], a
@@ -113,3 +129,11 @@ Main::
     ld hl, wBaseMemory + $200          ; Load HL (= PC) with base pointer
     jp EmuLoop
 
+SECTION "Text Data", ROM0
+fontNumbers:
+INCBIN "inc/font/numbers.bin"
+endFontNumbers:
+
+fontLetters:
+INCBIN "inc/font/letters.bin"
+endFontLetters:
