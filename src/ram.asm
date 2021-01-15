@@ -33,4 +33,6 @@ wSprOverflowY::  db
 wUpdateDisplay:: db
 
 SECTION "Selection Menu Variables", WRAM0
-wSelectionPage:: db
+wSelectionPage::      db
+wSelectionCursorPos:: db
+wInputCooldown::      db
