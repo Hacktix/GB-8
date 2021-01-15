@@ -24,6 +24,21 @@ Zerofill::
     jr nz, Zerofill
     ret
 
+; ------------------------------------------------------------------------------
+; Fills BC bytes starting from HL with the value D.
+; ------------------------------------------------------------------------------
+Memfill::
+    ld a, d
+    ld [hli], a
+    dec bc
+    ld a, b
+    or c
+    jr nz, Memfill
+    ret
+
+; ------------------------------------------------------------------------------
+; Prints the string at DE to VRAM starting at HL.
+; ------------------------------------------------------------------------------
 PrintString::
     ld a, [de]
     inc de

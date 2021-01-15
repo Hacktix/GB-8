@@ -104,6 +104,62 @@ Main::
     ld bc, endFontLetters - fontLetters
     call Memcpy
 
+    ; Load Border Tiles
+    ld hl, $8B00
+    ld de, borderTiles
+    ld bc, endBorderTiles - borderTiles
+    call Memcpy
+
+    ; Load top border into map
+    ld hl, $9801
+    ld d, $B0
+    ld a, d
+    ld [hli], a
+    inc d
+    ld bc, $0010
+    call Memfill
+    inc d
+    ld a, d
+    ld [hl], a
+
+    ; Load side borders into map
+    ld hl, $9821
+    ld de, $B708
+.sideBordersLoop
+    ld a, d
+    ld [hli], a
+    sub $04
+    ld d, a
+    ld a, l
+    add $10
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    ld a, d
+    ld [hli], a
+    add $04
+    ld d, a
+    ld a, l
+    add $0E
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    dec e
+    jr nz, .sideBordersLoop
+
+    ; Load bottom border into map
+    ld d, $B6
+    ld a, d
+    ld [hli], a
+    dec d
+    ld bc, $0010
+    call Memfill
+    dec d
+    ld a, d
+    ld [hl], a
+
     ; Turn off Audio initially
     ld a, AUDENA_OFF
     ldh [rAUDENA], a
@@ -129,7 +185,7 @@ Main::
     ld hl, wBaseMemory + $200          ; Load HL (= PC) with base pointer
     jp EmuLoop
 
-SECTION "Text Data", ROM0
+SECTION "Graphics", ROM0
 fontNumbers:
 INCBIN "inc/font/numbers.bin"
 endFontNumbers:
@@ -137,3 +193,7 @@ endFontNumbers:
 fontLetters:
 INCBIN "inc/font/letters.bin"
 endFontLetters:
+
+borderTiles:
+INCBIN "inc/gfx/border.bin"
+endBorderTiles:
