@@ -1,1 +1,2 @@
 EmuScreenPtrVRAM EQU $9842
+GameTitlePtrVRAM EQU $99AA

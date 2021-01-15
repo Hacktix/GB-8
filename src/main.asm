@@ -51,7 +51,10 @@ Main::
 
     ; Load ROM File
     ld hl, Airplane
+    push hl
     call InitROM
+    pop hl
+    call InitGameTitleDisplay
 
     ; Initialize Interrupts
     xor a

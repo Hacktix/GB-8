@@ -54,6 +54,18 @@ PrintString::
     jr PrintString
 
 ; ------------------------------------------------------------------------------
+; Returns the length of the string starting at HL in D.
+; ------------------------------------------------------------------------------
+Strln::
+    ld d, $00
+.strlenLoop
+    ld a, [hli]
+    and a
+    ret z
+    inc d
+    jr .strlenLoop
+
+; ------------------------------------------------------------------------------
 ; Starts reading a ROM file entry at HL and initializes the emulator
 ; for it.
 ; ------------------------------------------------------------------------------

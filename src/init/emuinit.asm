@@ -129,3 +129,28 @@ InitEmuBorder::
     ret
 
 strChip8: db "CHIP 8", 0
+
+; ------------------------------------------------------------------------------
+; Loads the game title from HL and centers it on screen below the emulator
+; display screen.
+; ------------------------------------------------------------------------------
+InitGameTitleDisplay::
+    ; Load horizontal offset into B, string pointer into DE
+    push hl
+    call Strln
+    ld a, d
+    srl a
+    ld b, a
+    pop de
+
+    ; Offset HL by B
+    ld a, LOW(GameTitlePtrVRAM)
+    sub b
+    ld l, a
+    ld h, HIGH(GameTitlePtrVRAM)
+    jr nc, .skipOffsetCarry
+    dec h
+.skipOffsetCarry
+
+    ; Print String
+    jp PrintString
