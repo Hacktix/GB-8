@@ -1,0 +1,1 @@
+EmuScreenPtrVRAM EQU $9842
