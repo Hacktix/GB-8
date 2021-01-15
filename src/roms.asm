@@ -29,7 +29,7 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 Pong::
 ; ROM Title
-db "Pong (1P)", 0
+db "PONG 1P", 0
 
 ; Emulation Speed
 db 15
@@ -50,7 +50,7 @@ pongDataEnd:
 ; ------------------------------------------------------------------------------
 Airplane::
 ; ROM Title
-db "Airplane", 0
+db "AIRPLANE", 0
 
 ; Emulation Speed
 db 12
@@ -71,7 +71,7 @@ airplaneDataEnd:
 ; ------------------------------------------------------------------------------
 Blinky::
 ; ROM Title
-db "Blinky", 0
+db "BLINKY", 0
 
 ; Emulation Speed
 db 20
@@ -92,7 +92,7 @@ blinkyDataEnd:
 ; ------------------------------------------------------------------------------
 Cave::
 ; ROM Title
-db "Cave", 0
+db "CAVE", 0
 
 ; Emulation Speed
 db 10
@@ -113,7 +113,7 @@ caveDataEnd:
 ; ------------------------------------------------------------------------------
 Fall::
 ; ROM Title
-db "Fall", 0
+db "FALL", 0
 
 ; Emulation Speed
 db 25
