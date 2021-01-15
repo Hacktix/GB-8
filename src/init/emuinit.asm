@@ -128,8 +128,6 @@ InitEmuBorder::
 
     ret
 
-strChip8: db "CHIP 8", 0
-
 ; ------------------------------------------------------------------------------
 ; Loads the game title from HL and centers it on screen below the emulator
 ; display screen.

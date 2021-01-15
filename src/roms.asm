@@ -24,6 +24,10 @@ SECTION "ROM Files", ROM0
 ;  Start, Select, B, A, DPad Down, DPad Up, DPad Left, DPad Right
 ; ------------------------------------------------------------------------------
 
+GameDataList::
+dw Airplane, Blinky, Cave, Fall, Pong
+dw $FFFF
+
 ; ------------------------------------------------------------------------------
 ; Pong (Singleplayer)
 ; ------------------------------------------------------------------------------

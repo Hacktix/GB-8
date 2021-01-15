@@ -1,12 +1,14 @@
 INCLUDE "inc/hardware.inc"
 INCLUDE "inc/gb8.inc"
 
+INCLUDE "src/data.asm"
 INCLUDE "src/roms.asm"
 INCLUDE "src/ram.asm"
 INCLUDE "src/functions.asm"
 INCLUDE "src/emu.asm"
 INCLUDE "src/init/gfxinit.asm"
 INCLUDE "src/init/emuinit.asm"
+INCLUDE "src/selection.asm"
 
 SECTION "Vectors", ROM0[0]
     ds $40 - @
@@ -41,43 +43,5 @@ Main::
     call InitPalettes
     call InitFont
 
-    ; Initialize Emulator Variables
-    call InitSysvars
-    call InitEmuVRAM
-
-    ; Turn off Audio initially
-    ld a, AUDENA_OFF
-    ldh [rAUDENA], a
-
-    ; Load ROM File
-    ld hl, Airplane
-    push hl
-    call InitROM
-    pop hl
-    call InitGameTitleDisplay
-
-    ; Initialize Interrupts
-    xor a
-    ldh [rIF], a
-    ld a, IEF_VBLANK
-    ldh [rIE], a
-    ld a, LCDCF_ON | LCDCF_BGON | LCDCF_BG8000
-    ldh [rLCDC], a
-    ei
-
-    ; Initialize system variables and start emulator
-    ld hl, wBaseMemory + $200          ; Load HL (= PC) with base pointer
-    jp EmuLoop
-
-SECTION "Graphics", ROM0
-fontNumbers:
-INCBIN "inc/font/numbers.bin"
-endFontNumbers:
-
-fontLetters:
-INCBIN "inc/font/letters.bin"
-endFontLetters:
-
-borderTiles:
-INCBIN "inc/gfx/border.bin"
-endBorderTiles:
+    ; Jump to Selection Menu Initialization
+    jp StartSelectionMenu

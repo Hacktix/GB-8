@@ -31,3 +31,6 @@ wSpriteSize::    db
 wSprOverflow::   db
 wSprOverflowY::  db
 wUpdateDisplay:: db
+
+SECTION "Selection Menu Variables", WRAM0
+wSelectionPage:: db
