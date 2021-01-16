@@ -4,6 +4,7 @@ StartSelectionMenu::
     xor a
     ld [wSelectionPage], a
     ld [wInputCooldown], a
+    ld [wAllowInput], a
 
 ReloadSelectionMenu::
     ; Clear VRAM
@@ -125,6 +126,19 @@ SelectionMenuLoop::
     cpl
     and $0F
     or d
+
+    ; Check if input allowed, if not wait for input to be all low
+    ld d, a
+    ld a, [wAllowInput]
+    and a
+    jr nz, .inputAllowed
+    xor a
+    or d
+    jr nz, SelectionMenuLoop
+    inc a
+    ld [wAllowInput], a
+.inputAllowed
+    ld a, d
 
     ; Check for down button press
     bit 3, a

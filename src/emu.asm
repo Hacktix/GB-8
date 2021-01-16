@@ -28,6 +28,13 @@ EmuLoop::
     or d
     ld [wInputData], a
 
+    ; Check for reset combo
+    and $F0
+    cp $F0
+    jp z, Main
+
+.noReset
+
     ; Update Delay Timer
     ld a, [wRegDelay]
     and a

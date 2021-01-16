@@ -37,3 +37,4 @@ wSelectionPage::      db
 wSelectionCursorPos:: db
 wInputCooldown::      db
 wPageTitles::         db
+wAllowInput::         db
