@@ -25,9 +25,30 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 
 GameDataList::
-dw Airplane, AstroDodge, Blinky, Cave, Fall, Particle, Pong, Sierpinski, Trip8
+dw Airplane, AstroDodge, Blinky, Breakout, Cave, Fall, Particle, Pong, Sierpinski, Trip8
 dw $FFFF
 EndGameDataList::
+
+; ------------------------------------------------------------------------------
+; Breakout
+; ------------------------------------------------------------------------------
+Breakout::
+; ROM Title
+db "BREAKOUT", 0
+
+; Emulation Speed
+db 10
+
+; Button Mapping
+db $FF, $FF, $FF, $FF, $FF, $FF, $04, $06
+
+; ROM Size
+dw breakoutDataEnd - breakoutData
+
+; ROM Data
+breakoutData:
+INCBIN "inc/roms/Breakout.ch8"
+breakoutDataEnd:
 
 ; ------------------------------------------------------------------------------
 ; Astro Dodge
