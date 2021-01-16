@@ -194,10 +194,14 @@ SelectionMenuLoop::
     jp ReloadSelectionMenu
 
 .noRightPress
-    ; Check for Start button press
+    ; Check for Start/A button press
     bit 7, a
-    jr z, .noStartPress
+    jr nz, .startCurROM
+    bit 4, a
+    jr nz, .startCurROM
+    jr .noStartAPress
 
+.startCurROM
     ; Disable LCD
     xor a
     ld [rLCDC], a
@@ -210,8 +214,8 @@ SelectionMenuLoop::
     ld h, a
     jp StartROM
 
-.noStartPress
-    jr SelectionMenuLoop
+.noStartAPress
+    jp SelectionMenuLoop
 
 ; ------------------------------------------------------------------------------
 ; Adds the value in A to the cursor position and updates the position
