@@ -118,7 +118,7 @@ caveDataEnd:
 ; ------------------------------------------------------------------------------
 Fall::
 ; ROM Title
-db "FALL", 0
+db "FALL DEMO", 0
 
 ; Emulation Speed
 db 25
