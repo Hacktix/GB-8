@@ -25,9 +25,30 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 
 GameDataList::
-dw Airplane, Blinky, Cave, Fall, Pong
+dw Airplane, Blinky, Cave, Fall, Pong, Particle
 dw $FFFF
 EndGameDataList::
+
+; ------------------------------------------------------------------------------
+; Particle Demo
+; ------------------------------------------------------------------------------
+Particle::
+; ROM Title
+db "PARTICLE DEMO", 0
+
+; Emulation Speed
+db 40
+
+; Button Mapping
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+; ROM Size
+dw particleDataEnd - particleData
+
+; ROM Data
+particleData:
+INCBIN "inc/roms/Particle.ch8"
+particleDataEnd:
 
 ; ------------------------------------------------------------------------------
 ; Pong (Singleplayer)
