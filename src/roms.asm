@@ -25,9 +25,30 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 
 GameDataList::
-dw Airplane, Blinky, Cave, Fall, Pong, Particle
+dw Airplane, Blinky, Cave, Fall, Particle, Pong, Sierpinski
 dw $FFFF
 EndGameDataList::
+
+; ------------------------------------------------------------------------------
+; Sierpinski Demo
+; ------------------------------------------------------------------------------
+Sierpinski::
+; ROM Title
+db "SIERPINSKI DEMO", 0
+
+; Emulation Speed
+db 255
+
+; Button Mapping
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+; ROM Size
+dw sierpinskiDataEnd - sierpinskiData
+
+; ROM Data
+sierpinskiData:
+INCBIN "inc/roms/Sierpinski.ch8"
+sierpinskiDataEnd:
 
 ; ------------------------------------------------------------------------------
 ; Particle Demo
