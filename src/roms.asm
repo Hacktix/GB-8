@@ -27,6 +27,7 @@ SECTION "ROM Files", ROM0
 GameDataList::
 dw Airplane, Blinky, Cave, Fall, Pong
 dw $FFFF
+EndGameDataList::
 
 ; ------------------------------------------------------------------------------
 ; Pong (Singleplayer)

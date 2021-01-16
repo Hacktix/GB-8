@@ -36,3 +36,4 @@ SECTION "Selection Menu Variables", WRAM0
 wSelectionPage::      db
 wSelectionCursorPos:: db
 wInputCooldown::      db
+wPageTitles::         db

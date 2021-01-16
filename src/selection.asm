@@ -6,20 +6,42 @@ StartSelectionMenu::
     ld [wInputCooldown], a
 
 ReloadSelectionMenu::
+    ; Clear VRAM
+    ld hl, $9820
+    ld bc, $0800
+    call Zerofill
+
     ; Reset cursor to zero
     xor a
     ld [wSelectionCursorPos], a
+    ld [wPageTitles], a
     ld a, CursorTileNo
     ld [$9820], a
 
-    ; Load BC with ROM table pointer + page offset
+    ; Validate current page, set to 0 if invalid
     ld a, [wSelectionPage]
-    swap a
-    add LOW(GameDataList)
+    cp ((EndGameDataList - GameDataList - 2) / 2) / 15 + !!(((EndGameDataList - GameDataList - 2) / 2) % 15)
+    jr c, .validPage
+    xor a
+    ld [wSelectionPage], a 
+.validPage
+
+    ; Load BC with ROM table pointer + page offset
+    ld bc, GameDataList
+    ld a, [wSelectionPage]
+    and a
+    jr z, .skipPageOffset
+    ld d, a
+.pageOffsetLoop
+    ld a, $1E
+    add c
     ld c, a
-    adc HIGH(GameDataList)
+    adc b
     sub c
     ld b, a
+    dec d
+    jr nz, .pageOffsetLoop
+.skipPageOffset
     push bc          ; Preserve pointer for later on
 
     ; Load HL with VRAM pointer
@@ -49,6 +71,11 @@ ReloadSelectionMenu::
     adc h
     sub l
     ld h, a
+
+    ; Increment page titles variable
+    ld a, [wPageTitles]
+    inc a
+    ld [wPageTitles], a
 
     ; Check if end of screen is reached, loop if not
     ld a, h
@@ -103,47 +130,59 @@ SelectionMenuLoop::
     bit 3, a
     jr z, .noDownPress
 
-    ; Update cursor position and ROM pointer
-    xor a
-    ld [hl], a
-    ld a, l
-    add $20
-    ld l, a
-    adc h
-    sub l
-    ld h, a
-    ld a, CursorTileNo
-    ld [hl], a
-    inc bc
-    inc bc
-    jr .inputDone
+    ; Update cursor position
+    ld a, 1
+    jp UpdateCursorPosition
 
 .noDownPress
-
     ; Check for up button press
     bit 2, a
     jr z, .noUpPress
 
-    ; Update cursor position and ROM pointer
-    xor a
-    ld [hl], a
-    ld a, l
-    sub $20
-    ld l, a
-    jr nc, .noUpBorrow
-    dec h
-.noUpBorrow
-    ld a, CursorTileNo
-    ld [hl], a
-    dec bc
-    dec bc
-    jr .inputDone
+    ; Update cursor position
+    ld a, $FF
+    jp UpdateCursorPosition
 
 .noUpPress
+    ; Check for left button press
+    bit 1, a
+    jr z, .noLeftPress
 
+    ; Disable LCD
+    xor a
+    ld [rLCDC], a
+
+    ; Reset input cooldown
+    ld a, PageSwitchCooldownDuration
+    ld [wInputCooldown], a
+
+    ; Update page number and reload
+    ld hl, wSelectionPage
+    dec [hl]
+    jp ReloadSelectionMenu
+
+.noLeftPress
+    ; Check for right button press
+    bit 0, a
+    jr z, .noRightPress
+
+    ; Disable LCD
+    xor a
+    ld [rLCDC], a
+
+    ; Reset input cooldown
+    ld a, PageSwitchCooldownDuration
+    ld [wInputCooldown], a
+
+    ; Update page number and reload
+    ld hl, wSelectionPage
+    inc [hl]
+    jp ReloadSelectionMenu
+
+.noRightPress
     ; Check for Start button press
     bit 7, a
-    jr z, .noInput
+    jr z, .noStartPress
 
     ; Disable LCD
     xor a
@@ -157,19 +196,103 @@ SelectionMenuLoop::
     ld h, a
     jp StartROM
 
-.inputDone
-    ld a, InputCooldownDuration
-    ld [wInputCooldown], a
-
-.noInput
+.noStartPress
     jr SelectionMenuLoop
 
 ; ------------------------------------------------------------------------------
-; Starts up the emulator after initializing the ROM stored at HL
+; Adds the value in A to the cursor position and updates the position
+; ------------------------------------------------------------------------------
+UpdateCursorPosition::
+    ; Preserve A, clear cursor at current position
+    push af
+    ld h, $00
+    ld a, [wSelectionCursorPos]
+    swap a
+    sla a
+    jr nc, .noOldCarry
+    inc h
+.noOldCarry
+    add $20
+    ld l, a
+    adc $98
+    add h
+    sub l
+    ld h, a
+    xor a
+    ld [hl], a
+
+    ; Calculate new cursor position
+    pop af
+    ld d, a
+    ld a, [wPageTitles]
+    ld e, a
+    ld a, [wSelectionCursorPos]
+    add d
+    cp e
+    jr c, .validRange
+    xor a
+.validRange
+    ld [wSelectionCursorPos], a
+
+    ; Place cursor tile at new VRAM pointer
+    ld h, $00
+    swap a
+    sla a
+    jr nc, .noNewCarry
+    inc h
+.noNewCarry
+    add $20
+    ld l, a
+    adc $98
+    sub l
+    add h
+    ld h, a
+    ld a, CursorTileNo
+    ld [hl], a
+
+    ; Update input cooldown
+    ld a, InputCooldownDuration
+    ld [wInputCooldown], a
+
+    ; Return to main loop
+    jp SelectionMenuLoop
+
+; ------------------------------------------------------------------------------
+; Starts up the emulator after initializing the ROM
 ; ------------------------------------------------------------------------------
 StartROM::
-    ; Preserve ROM Data Pointer
-    push hl
+    ; Load HL with ROM table pointer + page offset
+    ld hl, GameDataList
+    ld a, [wSelectionPage]
+    and a
+    jr z, .skipPageOffset
+    ld d, a
+.pageOffsetLoop
+    ld a, $1E
+    add l
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+    dec d
+    jr nz, .pageOffsetLoop
+.skipPageOffset
+
+    ; Add cursor offset
+    ld a, [wSelectionCursorPos]
+    add a
+    add a, l
+    ld l, a
+    adc h
+    sub l
+    ld h, a
+
+    ; Push ROM pointer to stack
+    ld a, [hli]
+    ld c, a
+    ld a, [hl]
+    ld b, a
+    push bc
 
     ; Initialize Emulator Variables
     call InitSysvars
