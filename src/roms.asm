@@ -25,9 +25,30 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 
 GameDataList::
-dw Airplane, AstroDodge, Blinky, Breakout, Cave, Fall, Particle, Pong, Sierpinski, Trip8
+dw Airplane, AstroDodge, Blinky, Breakout, Cave, Fall, Kaleidoscope, Particle, Pong, Sierpinski, Trip8
 dw $FFFF
 EndGameDataList::
+
+; ------------------------------------------------------------------------------
+; Kaleidoscope
+; ------------------------------------------------------------------------------
+Kaleidoscope::
+; ROM Title
+db "KALEIDOSCOPE", 0
+
+; Emulation Speed
+db 10
+
+; Button Mapping
+db $00, $FF, $FF, $FF, $08, $02, $04, $06
+
+; ROM Size
+dw kaleidoscopeDataEnd - kaleidoscopeData
+
+; ROM Data
+kaleidoscopeData:
+INCBIN "inc/roms/Kaleidoscope.ch8"
+kaleidoscopeDataEnd:
 
 ; ------------------------------------------------------------------------------
 ; Breakout
