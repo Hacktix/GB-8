@@ -25,9 +25,30 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 
 GameDataList::
-dw Airplane, Blinky, Cave, Fall, Particle, Pong, Sierpinski, Trip8
+dw Airplane, AstroDodge, Blinky, Cave, Fall, Particle, Pong, Sierpinski, Trip8
 dw $FFFF
 EndGameDataList::
+
+; ------------------------------------------------------------------------------
+; Astro Dodge
+; ------------------------------------------------------------------------------
+AstroDodge::
+; ROM Title
+db "ASTRODODGE", 0
+
+; Emulation Speed
+db 10
+
+; Button Mapping
+db $05, $FF, $FF, $FF, $08, $02, $04, $06
+
+; ROM Size
+dw astroDodgeDataEnd - astroDodgeData
+
+; ROM Data
+astroDodgeData:
+INCBIN "inc/roms/AstroDodge.ch8"
+astroDodgeDataEnd:
 
 ; ------------------------------------------------------------------------------
 ; Trip8 Demo
