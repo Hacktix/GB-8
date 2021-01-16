@@ -30,6 +30,7 @@ Main::
     ; Store initial value of L in RAM
     ld [wInitialRegA], a
 
+Restart::
     ; Wait for VBlank, disable LCD
     ldh a, [rLY]
 	cp SCRN_Y

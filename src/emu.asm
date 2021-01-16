@@ -31,7 +31,7 @@ EmuLoop::
     ; Check for reset combo
     and $F0
     cp $F0
-    jp z, Main
+    jp z, Restart
 
 .noReset
 
