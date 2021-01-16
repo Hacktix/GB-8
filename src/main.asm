@@ -33,6 +33,10 @@ Main::
 	jr c, Main
     xor a
     ld [rLCDC], a
+
+    ; Disable Sound
+    ld a, AUDENA_OFF
+    ldh [rAUDENA], a
     
     ; Zero out VRAM tile data
     ld hl, $8000
