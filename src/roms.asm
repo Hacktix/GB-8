@@ -25,9 +25,30 @@ SECTION "ROM Files", ROM0
 ; ------------------------------------------------------------------------------
 
 GameDataList::
-dw Airplane, Blinky, Cave, Fall, Particle, Pong, Sierpinski
+dw Airplane, Blinky, Cave, Fall, Particle, Pong, Sierpinski, Trip8
 dw $FFFF
 EndGameDataList::
+
+; ------------------------------------------------------------------------------
+; Trip8 Demo
+; ------------------------------------------------------------------------------
+Trip8::
+; ROM Title
+db "TRIP8 DEMO", 0
+
+; Emulation Speed
+db 25
+
+; Button Mapping
+db $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+
+; ROM Size
+dw trip8DataEnd - trip8Data
+
+; ROM Data
+trip8Data:
+INCBIN "inc/roms/Trip8.ch8"
+trip8DataEnd:
 
 ; ------------------------------------------------------------------------------
 ; Sierpinski Demo
