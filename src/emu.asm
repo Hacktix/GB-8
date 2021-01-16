@@ -860,7 +860,7 @@ FJumpTable::
     dw LoadRegDTInstruction
     dw LoadSTInstruction
     dw LoadDigitPtrInstruction
-    dw DummyInstruction
+    dw WaitKeypressInstruction
     dw DummyInstruction
     dw DummyInstruction
     dw DummyInstruction
@@ -1001,6 +1001,50 @@ LoadDigitPtrInstruction::
     ld a, e
     ld [wRegI+1], a
 
+    pop hl
+    jp EmuLoop
+
+; ------------------------------------------------------------------------------
+; Fx0A - LD Vx, K
+; Wait for a key press, store the value of the key in Vx.
+; ------------------------------------------------------------------------------
+WaitKeypressInstruction::
+    ; Load Input Data
+    ld a, [wInputData]
+    ld d, a
+
+    ; Check if any buttons are pressed
+    ld hl, wInputMaskMap
+    ld e, $10
+.inputCheckLoop
+    ld a, [hli]
+    and d
+    jr nz, .inputFound
+    dec e
+    jr nz, .inputCheckLoop
+
+    ; If none pressed, keep repeating instruction
+    pop hl
+    dec hl
+    dec hl
+    jp EmuLoop
+
+.inputFound
+    ; Get input value
+    ld a, $10
+    sub e
+    ld e, a
+
+    ; Store in Vx
+    ld a, b
+    and $0F
+    ld l, a
+    ld a, HIGH(wRegV)
+    ld h, a
+    ld a, e
+    ld [hl], a
+
+    ; Return to loop
     pop hl
     jp EmuLoop
 
