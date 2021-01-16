@@ -38,3 +38,6 @@ wSelectionCursorPos:: db
 wInputCooldown::      db
 wPageTitles::         db
 wAllowInput::         db
+
+SECTION "Other Variables", WRAM0
+wInitialRegA:: db
