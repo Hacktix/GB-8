@@ -14,6 +14,24 @@ Simply download the newest version from the [Releases Section](https://github.co
 
 Controls for the games themselves are mapped on a per-game basis, most should be quite intuitive though.
 
+## Which ROMs are there?
+
+The current Release build comes packaged with the following ROMs:
+
+* Airplane (Game)
+* AstroDodge (Game)
+* Blinky (Game)
+* Breakout (Game)
+* Cave (Game)
+* Kaleidoscope (Demo)
+* Particle (Demo)
+* Pong (Game)
+* Sierpinski (Demo)
+* Trip8 (Demo)
+* Fall (Demo)
+
+If you clone the repository you can add your own CHIP-8 ROMs and assemble a new GB ROM, all you need to do is to change the `src/roms.asm` file to your needs. A description of the file format can be found at the top of the file.
+
 ## What does it look like?
 
 Except for the menu parts of the emulator, it's simply just a common CHIP-8 display. For convenience, the emulator scales the screen up by a factor of 2, so that things are visible without having to squint at them.
